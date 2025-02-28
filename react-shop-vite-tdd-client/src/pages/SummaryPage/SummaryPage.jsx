@@ -7,38 +7,47 @@ const SummaryPage = ({ setStep }) => {
     const [{ totals, userPoints }, , , deductPoints, getOrderData] = useContext(OrderContext);
     const [checked, setChecked] = useState(false);
     const [usePoints, setUsePoints] = useState(false);
+    const [usedPoints, setUsedPoints] = useState(0);
     const [error, setError] = useState(null);
-    const [isSubmitting, setIsSubmitting] = useState(false); // 중복 요청 방지 상태 추가
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const totalPrice = totals.total;
 
-    const handleSubmit = async (event) => {
-        event.preventDefault(); // ✅ 폼 기본 동작 방지
+    // ✅ 포인트 입력 시 실시간 유효성 검사
+    const handlePointsChange = (event) => {
+        let value = parseInt(event.target.value, 10) || 0;
 
-        if (isSubmitting) return; // 이미 결제가 진행 중이면 중복 요청 방지
-        setIsSubmitting(true); // ✅ 이걸 가장 먼저 실행하여 중복 요청 방지
+        if (value > userPoints) {
+            setError("보유 포인트보다 많은 금액을 사용할 수 없습니다.");
+        } else if (value > totalPrice) {
+            setError("사용할 포인트가 결제 금액을 초과할 수 없습니다.");
+        } else {
+            setError(null); // 올바른 값 입력 시 에러 제거
+        }
+
+        setUsedPoints(value);
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (isSubmitting || error) return; // ✅ 에러가 있으면 결제 불가
+        setIsSubmitting(true);
 
         try {
-            // 결제 처리
-            processPayment(userPoints, totalPrice, usePoints);
-            deductPoints(totalPrice);
+            processPayment(userPoints, totalPrice, usePoints ? usedPoints : 0);
+            deductPoints(usedPoints);
 
-            // 주문 데이터를 JSON 형식으로 변환하여 서버로 전송
             const orderData = getOrderData();
-
             console.log("📌 전송할 데이터:", JSON.stringify(orderData, null, 2));
 
-            // 주문 데이터를 서버로 전송
             const response = await axios.post("http://localhost:5003/order", orderData);
-
             console.log("✅ 주문 완료:", response.data);
 
-            // 결제 성공 시 다음 단계로 이동
             setStep(2);
         } catch (e) {
             setError(e.message);
         } finally {
-            setTimeout(() => setIsSubmitting(false), 1000); // ✅ 상태 초기화 지연 처리
+            setTimeout(() => setIsSubmitting(false), 1000);
         }
     };
 
@@ -47,14 +56,21 @@ const SummaryPage = ({ setStep }) => {
             <div className="card p-4 shadow-lg">
                 <h1 className="mb-3 text-primary">주문 확인</h1>
                 <h2 className="fw-bold text-dark">총 주문 금액: {totalPrice.toLocaleString()}원</h2>
-                <h3 className="text-secondary">현재 보유 포인트: {userPoints?.toLocaleString() ?? 0}원</h3> {/* ✅ `undefined` 방지 */}
+                <h3 className="text-secondary">현재 보유 포인트: {userPoints?.toLocaleString() ?? 0}원</h3>
 
+                {/* ✅ 포인트 사용 체크박스 */}
                 <div className="mt-3 form-check">
                     <input
                         type="checkbox"
                         className="form-check-input"
                         checked={usePoints}
-                        onChange={(e) => setUsePoints(e.target.checked)}
+                        onChange={(e) => {
+                            setUsePoints(e.target.checked);
+                            if (!e.target.checked) {
+                                setUsedPoints(0);
+                                setError(null);
+                            }
+                        }}
                         id="usePointsCheckbox"
                     />
                     <label className="form-check-label" htmlFor="usePointsCheckbox">
@@ -62,7 +78,28 @@ const SummaryPage = ({ setStep }) => {
                     </label>
                 </div>
 
-                {error && <p className="text-danger mt-2 fw-bold">{error}</p>} {/* ✅ 에러 메시지 디자인 개선 */}
+                {/* ✅ 포인트 입력 UI (체크 시 활성화) */}
+                {usePoints && (
+                    <div className="mt-2">
+                        <label htmlFor="usedPointsInput" className="form-label fw-bold">
+                            사용할 포인트:
+                        </label>
+                        <input
+                            type="number"
+                            id="usedPointsInput"
+                            className="form-control text-center"
+                            value={usedPoints}
+                            onChange={handlePointsChange}
+                            min="0"
+                            max={userPoints}
+                        />
+                        <p className="text-muted">
+                            사용 가능 포인트: {userPoints.toLocaleString()}원
+                        </p>
+                        {/* ✅ 실시간 에러 메시지 */}
+                        {error && <p className="text-danger fw-bold mt-1">{error}</p>}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="mt-4">
                     <div className="form-check d-flex justify-content-center">
@@ -79,11 +116,11 @@ const SummaryPage = ({ setStep }) => {
                     </div>
 
                     <button
-                        disabled={!checked || isSubmitting}
+                        disabled={!checked || isSubmitting || !!error} // 에러 발생 시 결제 버튼 비활성화
                         type="submit"
                         className={`btn btn-lg mt-3 ${isSubmitting ? "btn-secondary" : "btn-success"}`}
                     >
-                        결제하기
+                        {isSubmitting ? "결제 중..." : "결제하기"}
                     </button>
                 </form>
             </div>
