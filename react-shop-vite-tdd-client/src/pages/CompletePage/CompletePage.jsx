@@ -4,7 +4,7 @@ import ErrorBanner from "../../components/ErrorBanner";
 import { OrderContext } from "../../contexts/OrderContext";
 
 function CompletePage({ setStep }) {
-    const [{ userPoints }, , , resetOrderDatas, getOrderData] = useContext(OrderContext);
+    const [{ userPoints }, , resetOrderDatas, , getOrderData] = useContext(OrderContext);
     const [orderHistory, setOrderHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
