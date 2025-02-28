@@ -4,6 +4,7 @@ import Products from "./Products";
 import Options from "./Options";
 import ErrorBanner from "../../components/ErrorBanner";
 import { OrderContext } from "../../contexts/OrderContext";
+import "./style/OrderPage.css";
 
 function Type({ orderType }) {
     const [items, setItems] = useState([]);
@@ -40,7 +41,7 @@ function Type({ orderType }) {
                     ? `총 상품 가격: ${totalPrice.toLocaleString()}원`
                     : `총 옵션 가격: ${totalPrice.toLocaleString()}원`}
             </h4>
-            <div className="row mt-3">
+            <div className="row mt-3 type">
                 {items.map((item) => (
                     <div className="col-md-6" key={item.name}>
                         <ItemComponent

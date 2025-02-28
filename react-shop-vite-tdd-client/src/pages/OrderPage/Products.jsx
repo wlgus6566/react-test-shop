@@ -20,6 +20,7 @@ function Products({ name, imagePath, updateItemCount }) {
           id={name}
           style={{ marginLeft: 7 }}
           type="number"
+          className="form-number"
           name="quantity"
           min="0"
           defaultValue={0}

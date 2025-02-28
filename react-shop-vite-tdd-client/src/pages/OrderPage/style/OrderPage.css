@@ -1,0 +1,11 @@
+.type {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.type > div {
+    width: calc((100% - 40px) / 2);
+}
+.type input.form-number {
+    width: 100%;
+}
