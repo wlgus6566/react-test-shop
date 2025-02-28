@@ -1,39 +1,46 @@
 import { render, screen } from "../../../test-utils";
-import { server } from "../../../mocks/server";
+import userEvent from "@testing-library/user-event";
 import Type from "../Type";
-import { HttpResponse, http } from "msw";
 
-test("displays product images from server", async () => {
-  render(<Type orderType="products" />);
+describe("상품 및 옵션 선택 테스트", () => {
+  test("상품 개수를 변경할 때 총 가격이 올바르게 반영된다.", async () => {
+    const user = userEvent.setup();
+    render(<Type orderType="products" />);
 
-  // 이미지 찾기
-  const productImages = await screen.findAllByRole("img", {
-    name: /product$/i,
+    const productsTotal = screen.getByText("총 상품 가격:", { exact: false });
+    expect(productsTotal).toHaveTextContent(`0원`);
+
+    const americaInput = await screen.findByRole("spinbutton", { name: "America" });
+
+    const testCases = [
+      { value: "1", expected: 1000 },
+      { value: "3", expected: 3000 },
+      { value: "0", expected: 0 },
+    ];
+
+    for (const { value, expected } of testCases) {
+      await user.clear(americaInput);
+      await user.type(americaInput, value);
+      expect(productsTotal).toHaveTextContent(`${expected.toLocaleString()}원`);
+    }
   });
-  expect(productImages).toHaveLength(2);
 
-  const altText = productImages.map((element) => element.alt);
-  expect(altText).toEqual(["America product", "England product"]);
-});
+  test("옵션이 변경될 때 총 옵션 가격이 업데이트되는지 확인", async () => {
+    const user = userEvent.setup();
+    render(<Type orderType="options" />);
 
-test("fetch option information from server", async () => {
-  render(<Type orderType="options" />);
+    const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
+    expect(optionsTotal).toHaveTextContent(`0원`);
 
-  // 체크박스 가져오기
-  const optionCheckboxes = await screen.findAllByRole("checkbox");
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: "Insurance" });
+    await user.click(insuranceCheckbox);
+    expect(optionsTotal).toHaveTextContent(`500원`);
 
-  expect(optionCheckboxes).toHaveLength(2);
-});
+    const dinnerCheckbox = await screen.findByRole("checkbox", { name: "Dinner" });
+    await user.click(dinnerCheckbox);
+    expect(optionsTotal).toHaveTextContent(`1,000원`);
 
-test("when fetching product datas, face an error", async () => {
-  server.resetHandlers(
-    http.get("http://localhost:3000/5003", () => {
-      return new HttpResponse(null, { status: 500 });
-    })
-  );
-
-  render(<Type orderType="products" />);
-
-  const errorBanner = await screen.findByTestId("error-banner");
-  expect(errorBanner).toHaveTextContent("에러가 발생했습니다.")
+    await user.click(dinnerCheckbox); // 옵션 해제
+    expect(optionsTotal).toHaveTextContent(`500원`);
+  });
 });

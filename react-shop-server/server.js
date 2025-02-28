@@ -36,6 +36,12 @@ app.post('/order', (req, res) => {
   res.status(201).json( orderHistory )
 })
 
+app.delete('/order-history', (req, res) => {
+  orderHistory = []; // ✅ 주문 기록 초기화
+  res.status(200).json({ message: "Order history cleared" });
+});
+
+
 if (require.main === module) {
   app.listen(port, () => console.log(`listening on port ${port}`))
 }

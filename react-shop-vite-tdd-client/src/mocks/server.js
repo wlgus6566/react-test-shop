@@ -1,6 +1,4 @@
-import { setupServer } from "msw/node";
-import { handlers } from "./handlers";
+import { setupServer } from 'msw/node'; // Node.js에서 동작하도록 MSW server 사용
+import { handlers } from './handlers'; // API 요청 핸들러 목록 가져오기
 
-// mocking server 생성
-// This configures a request mocking server with the given request handlers.
 export const server = setupServer(...handlers);

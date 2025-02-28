@@ -6,58 +6,52 @@ import ErrorBanner from "../../components/ErrorBanner";
 import { OrderContext } from "../../contexts/OrderContext";
 
 function Type({ orderType }) {
-  const [items, setItems] = useState([]);
-  const [error, setError] = useState(false);
-  const [orderDatas, updateItemCount] = useContext(OrderContext);
+    const [items, setItems] = useState([]);
+    const [error, setError] = useState(false);
+    const [{ totals }, updateItemCount] = useContext(OrderContext);
 
-  useEffect(() => {
-    loadItems(orderType);
-  }, [orderType]);
+    useEffect(() => {
+        loadItems(orderType);
+    }, [orderType]);
 
-  const loadItems = async (orderType) => {
-    try {
-      let response = await axios.get(`http://localhost:5003/${orderType}`);
-      setItems(response.data);
-    } catch (error) {
-      setError(true);
+    const loadItems = async () => {
+        try {
+            let response = await axios.get(`http://localhost:5003/${orderType}`);
+            setItems(response.data);
+        } catch (error) {
+            setError(true);
+        }
+    };
+
+    if (error) {
+        return <ErrorBanner message="에러가 발생했습니다." />;
     }
-  };
 
-  if (error) {
-    return <ErrorBanner message="에러가 발생했습니다." />;
-  }
+    const ItemComponent = orderType === "products" ? Products : Options;
+    const orderTypeKorean = orderType === "products" ? "상품" : "옵션";
 
-  const ItemComponents = orderType === "products" ? Products : Options;
-
-  const optionItems = items.map((item) => (
-    <ItemComponents
-      key={item.name}
-      name={item.name}
-      imagePath={item.imagePath}
-      updateItemCount={(itemName, newItemCount) =>
-        updateItemCount(itemName, newItemCount, orderType)
-      }
-    />
-  ));
-
-  let orderTypeKorean = orderType === "products" ? "상품" : "옵션";
-  return (
-    <>
-      <h2>주문 종류</h2>
-      <p>하나의 가격</p>
-      <p>
-        {orderTypeKorean} 총 가격: {orderDatas.totals[orderType]}
-      </p>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: orderType === "options" && "column",
-        }}
-      >
-        {optionItems}
-      </div>
-    </>
-  );
+    return (
+        <div className="card p-3 shadow-sm">
+            <h2 className="text-center text-primary">{orderTypeKorean} 선택</h2>
+            <p className="text-center">개별 가격</p>
+            <h4 className="text-center fw-bold text-danger">
+                {orderType === "products"
+                    ? `총 상품 가격: ${(totals[orderType] || 0).toLocaleString()}원`
+                    : `총 옵션 가격: ${(totals[orderType] || 0).toLocaleString()}원`}
+            </h4>
+            <div className="row mt-3">
+                {items.map((item) => (
+                    <div className="col-md-6" key={item.name}>
+                        <ItemComponent
+                            name={item.name}
+                            imagePath={item.imagePath}
+                            updateItemCount={(name, count) => updateItemCount(name, count, orderType)}
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default Type;

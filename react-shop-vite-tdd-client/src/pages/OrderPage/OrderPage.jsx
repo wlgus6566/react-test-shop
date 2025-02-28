@@ -3,26 +3,27 @@ import { OrderContext } from "../../contexts/OrderContext";
 import Type from "./Type";
 
 function OrderPage({ setStep }) {
-  const [orderDatas] = useContext(OrderContext);
+    const [{ totals }] = useContext(OrderContext);
 
-  return (
-    <div>
-      <h1>Travel Products</h1>
-      <div>
-        <Type orderType="products" />
-      </div>
-      <div style={{ display: "flex", marginTop: 20 }}>
-        <div style={{ width: "50%" }}>
-          <Type orderType="options" />
-        </div>
+    return (
         <div>
-          <h2>Total Price: {orderDatas.totals.total}</h2>
-          <br />
-          <button onClick={() => setStep(1)}>주문하기</button>
+            <h1 className="text-center mb-4">🛫 여행 상품 주문</h1>
+            <div className="row">
+                <div className="col-md-6">
+                    <Type orderType="products" />
+                </div>
+                <div className="col-md-6">
+                    <Type orderType="options" />
+                </div>
+            </div>
+            <div className="text-center mt-4">
+                <h2 className="fw-bold">총 금액: {totals.total.toLocaleString()}원</h2>
+                <button className="btn btn-primary btn-lg mt-3" onClick={() => setStep(1)}>
+                    주문하기
+                </button>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default OrderPage;

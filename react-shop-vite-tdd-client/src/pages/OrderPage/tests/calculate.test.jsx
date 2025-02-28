@@ -3,62 +3,56 @@ import userEvent from "@testing-library/user-event";
 import Type from "../Type";
 import OrderPage from "../OrderPage";
 
-test.only("update product's total when products change", async () => {
+test("상품 개수를 변경할 때 총 가격이 올바르게 반영된다.", async () => {
   const user = userEvent.setup();
-
   render(<Type orderType="products" />);
 
-  const productsTotal = screen.getByText("상품 총 가격:", { exact: false });
-  expect(productsTotal).toHaveTextContent("0");
+  const productsTotal = screen.getByText("총 상품 가격:", { exact: false });
+  expect(productsTotal).toHaveTextContent(`0원`);
 
-  // 아메리카 여행 상품 한개 올리기
-  const americaInput = await screen.findByRole("spinbutton", {
-    name: "America",
-  });
-  // user.type(americaInput, "3");
+  const americaInput = await screen.findByRole("spinbutton", { name: "America" });
 
-  // user.type(americaInput, "2");
-  // user.clear(americaInput);
-  await user.clear(americaInput);
+  const testCases = [
+    { value: "1", expected: 1000 },
+    { value: "3", expected: 3000 },
+    { value: "0", expected: 0 },
+  ];
 
-  await user.type(americaInput, "1");
-
-  console.log('use', productsTotal.textContent);
-  expect(productsTotal).toHaveTextContent("1000");
+  for (const { value, expected } of testCases) {
+    await user.clear(americaInput);
+    await user.type(americaInput, value);
+    expect(productsTotal).toHaveTextContent(`${expected.toLocaleString()}원`);
+  }
 });
 
-test("update option's total when options change", async () => {
+test("옵션이 변경될 때 총 옵션 가격이 업데이트되는지 확인하는 테스트", async () => {
   const user = userEvent.setup();
 
   render(<Type orderType="options" />);
 
-  const optionsTotal = screen.getByText("옵션 총 가격:", { exact: false });
-  expect(optionsTotal).toHaveTextContent("0");
+  const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
+  expect(optionsTotal).toHaveTextContent(`0원`);
 
-  const insuranceCheckbox = await screen.findByRole("checkbox", {
-    name: "Insurance",
-  });
+  const insuranceCheckbox = await screen.findByRole("checkbox", { name: "Insurance" });
   await user.click(insuranceCheckbox);
-  expect(optionsTotal).toHaveTextContent("500");
+  expect(optionsTotal).toHaveTextContent(`500원`);
 
-  const dinnerCheckbox = await screen.findByRole("checkbox", {
-    name: "Dinner",
-  });
+  const dinnerCheckbox = await screen.findByRole("checkbox", { name: "Dinner" });
   await user.click(dinnerCheckbox);
-  expect(optionsTotal).toHaveTextContent("1000");
+  expect(optionsTotal).toHaveTextContent(`1,000원`);
 
-  await user.click(dinnerCheckbox);
-  expect(optionsTotal).toHaveTextContent("500");
+  await user.click(dinnerCheckbox); // 옵션 해제
+  expect(optionsTotal).toHaveTextContent(`500원`);
 });
 
 describe("total price of goods and options", () => {
-  test("total price starts with 0 and Updating total price when adding one product", async () => {
+  test("total price starts with 0 and updates when adding one product", async () => {
     const user = userEvent.setup();
 
     render(<OrderPage />);
 
-    const total = screen.getByText("Total Price:", { exact: false });
-    expect(total).toHaveTextContent("0");
+    const total = screen.getByText("총 금액", { exact: false });
+    expect(total).toHaveTextContent(`0원`);
 
     const americaInput = await screen.findByRole("spinbutton", {
       name: "America",
@@ -66,27 +60,27 @@ describe("total price of goods and options", () => {
     await user.clear(americaInput);
     await user.type(americaInput, "1");
 
-    expect(total).toHaveTextContent("1000");
+    expect(total).toHaveTextContent(`1,000원`);
   });
 
   test("Updating total price when adding one option", async () => {
     const user = userEvent.setup();
 
     render(<OrderPage />);
-    const total = screen.getByText("Total Price:", { exact: false });
+    const total = screen.getByText("총 금액", { exact: false });
 
     const insuranceCheckbox = await screen.findByRole("checkbox", {
       name: "Insurance",
     });
     await user.click(insuranceCheckbox);
-    expect(total).toHaveTextContent("500");
+    expect(total).toHaveTextContent(`500원`);
   });
 
   test("Updating total price when removing option and product", async () => {
     const user = userEvent.setup();
 
     render(<OrderPage />);
-    const total = screen.getByText("Total Price:", { exact: false });
+    const total = screen.getByText("총 금액", { exact: false });
 
     const insuranceCheckbox = await screen.findByRole("checkbox", {
       name: "Insurance",
@@ -102,6 +96,6 @@ describe("total price of goods and options", () => {
     await user.clear(americaInput);
     await user.type(americaInput, "1");
 
-    expect(total).toHaveTextContent("1500");
+    expect(total).toHaveTextContent(`1,500원`);
   });
 });
