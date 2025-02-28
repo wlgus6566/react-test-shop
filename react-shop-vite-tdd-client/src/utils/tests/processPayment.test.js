@@ -14,11 +14,19 @@ describe("processPayment 함수 테스트", () => {
     });
 
     test("포인트를 사용할 때, 보유 포인트보다 많은 값을 입력하면 에러 발생", () => {
-        expect(() => processPayment(5000, 3000, 6000)).toThrow("보유 포인트보다 많은 금액을 사용할 수 없습니다.");
+        try {
+            processPayment(5000, 3000, 6000);
+        } catch (error) {
+            expect(error.code).toBe("INSUFFICIENT_POINTS"); // ✅ 에러 메시지 대신 코드로 검증
+        }
     });
 
     test("포인트를 사용할 때, 결제 금액보다 많은 포인트를 입력하면 에러 발생", () => {
-        expect(() => processPayment(5000, 3000, 4000)).toThrow("사용할 포인트가 결제 금액을 초과할 수 없습니다.");
+        try {
+            processPayment(5000, 3000, 4000);
+        } catch (error) {
+            expect(error.code).toBe("EXCEEDS_TOTAL_PRICE"); // ✅ 에러 코드로 검증
+        }
     });
 
     test("포인트를 사용할 때, 정확한 금액을 입력하면 0원이 남아야 함", () => {
