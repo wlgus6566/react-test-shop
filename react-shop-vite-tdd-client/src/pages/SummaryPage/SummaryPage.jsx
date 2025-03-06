@@ -6,7 +6,7 @@ import "./SummaryPage.css";
 
 
 const SummaryPage = ({ setStep }) => {
-    const [{ totals, userPoints }, , , deductPoints, getOrderData] = useContext(OrderContext);
+    const [{ totals, userPoints, products, options }, , , deductPoints, getOrderData] = useContext(OrderContext);
     const [checked, setChecked] = useState(false);
     const [usePoints, setUsePoints] = useState(false);
     const [usedPoints, setUsedPoints] = useState(0);
@@ -14,6 +14,18 @@ const SummaryPage = ({ setStep }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const totalPrice = totals.total;
+
+    // 선택한 상품 목록 생성
+    const productList = Array.from(products.entries())
+        .filter(([_, count]) => count > 0)
+        .map(([name, count]) => `${count} ${name}`)
+        .join(", ");
+
+    // 선택한 옵션 목록 생성
+    const optionList = Array.from(options.entries())
+        .filter(([_, count]) => count > 0)
+        .map(([name]) => name)
+        .join(", ");
 
     // ✅ 포인트 입력 시 실시간 유효성 검사
     const handlePointsChange = (event) => {
@@ -58,6 +70,19 @@ const SummaryPage = ({ setStep }) => {
             <h1 className="summary-title">주문 확인</h1>
             <h2 className="summary-total">총 주문 금액: {totalPrice.toLocaleString()}원</h2>
             <h3 className="summary-points">현재 보유 포인트: {userPoints?.toLocaleString() ?? 0}원</h3>
+
+            {/* 선택한 상품과 옵션 목록 */}
+            <div className="selected-items mt-4">
+                <div className="card mb-3">
+                    <div className="card-body">
+                        <h4 className="card-title">선택한 항목</h4>
+                        <div className="selected-items-list" data-testid="selected-items">
+                            <div>{productList}</div>
+                            <div>{optionList}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div className="checkbox-container">
                 <input
