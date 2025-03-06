@@ -66,7 +66,7 @@ function CompletePage({ setStep }) {
                     <div className="card-body">
                         <div className="text-center mb-4">
                             <div className="display-1 text-success mb-3">✓</div>
-                            <h2 className="card-title mb-3">주문이 성공했습니다!</h2>
+                            <h2 className="card-title mb-3">주문이 성공했습니다!!</h2>
                             <div className="alert alert-info">
                                 <h5 className="mb-0">
                                     남은 포인트: <strong>{userPoints !== undefined ? userPoints.toLocaleString() : 0}원</strong>

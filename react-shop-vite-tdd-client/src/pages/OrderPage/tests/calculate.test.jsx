@@ -3,99 +3,116 @@ import userEvent from "@testing-library/user-event";
 import Type from "../Type";
 import OrderPage from "../OrderPage";
 
-test("상품 개수를 변경할 때 총 가격이 올바르게 반영된다.", async () => {
+// 상수 정의
+const PRICES = {
+  PRODUCT_UNIT: 1000,
+  OPTION_UNIT: 500
+};
+
+const PRODUCTS = {
+  AMERICA: 'America',
+  ENGLAND: 'England'
+};
+
+const OPTIONS = {
+  INSURANCE: 'Insurance',
+  DINNER: 'Dinner'
+};
+
+// 테스트 헬퍼 함수
+const setupTest = (component) => {
   const user = userEvent.setup();
-  render(<Type orderType="products" />);
+  render(component);
+  return user;
+};
 
-  const productsTotal = screen.getByText("총 상품 가격:", { exact: false });
-  expect(productsTotal).toHaveTextContent(`0원`);
+const formatPrice = (price) => `${price.toLocaleString()}원`;
 
-  const americaInput = await screen.findByRole("spinbutton", { name: "America" });
+const findAndTypeInput = async (user, name, value) => {
+  const input = await screen.findByRole("spinbutton", { name });
+  await user.clear(input);
+  await user.type(input, value);
+  return input;
+};
 
-  const testCases = [
-    { value: "1", expected: 1000 },
-    { value: "3", expected: 3000 },
-    { value: "0", expected: 0 },
-  ];
+const findAndClickCheckbox = async (user, name) => {
+  const checkbox = await screen.findByRole("checkbox", { name });
+  await user.click(checkbox);
+  return checkbox;
+};
 
-  for (const { value, expected } of testCases) {
-    await user.clear(americaInput);
-    await user.type(americaInput, value);
-    expect(productsTotal).toHaveTextContent(`${expected.toLocaleString()}원`);
-  }
+describe("상품 가격 계산 테스트", () => {
+  test("상품 개수를 변경할 때 총 가격이 올바르게 반영된다", async () => {
+    const user = setupTest(<Type orderType="products" />);
+    const productsTotal = screen.getByText("총 상품 가격:", { exact: false });
+    
+    expect(productsTotal).toHaveTextContent(formatPrice(0));
+
+    const testCases = [
+      { value: "1", expected: PRICES.PRODUCT_UNIT },
+      { value: "3", expected: PRICES.PRODUCT_UNIT * 3 },
+      { value: "0", expected: 0 },
+    ];
+
+    for (const { value, expected } of testCases) {
+      await findAndTypeInput(user, PRODUCTS.AMERICA, value);
+      expect(productsTotal).toHaveTextContent(formatPrice(expected));
+    }
+  });
 });
 
-test("옵션이 변경될 때 총 옵션 가격이 업데이트되는지 확인하는 테스트", async () => {
-  const user = userEvent.setup();
+describe("옵션 가격 계산", () => {
+  test("옵션이 변경될 때 총 옵션 가격이 올바르게 업데이트된다", async () => {
+    const user = setupTest(<Type orderType="options" />);
+    const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
+    
+    expect(optionsTotal).toHaveTextContent(formatPrice(0));
 
-  render(<Type orderType="options" />);
+    // 보험 옵션 추가
+    await findAndClickCheckbox(user, OPTIONS.INSURANCE);
+    expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
 
-  const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
-  expect(optionsTotal).toHaveTextContent(`0원`);
+    // 저녁 식사 옵션 추가
+    await findAndClickCheckbox(user, OPTIONS.DINNER);
+    expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT * 2));
 
-  const insuranceCheckbox = await screen.findByRole("checkbox", { name: "Insurance" });
-  await user.click(insuranceCheckbox);
-  expect(optionsTotal).toHaveTextContent(`500원`);
-
-  const dinnerCheckbox = await screen.findByRole("checkbox", { name: "Dinner" });
-  await user.click(dinnerCheckbox);
-  expect(optionsTotal).toHaveTextContent(`1,000원`);
-
-  await user.click(dinnerCheckbox); // 옵션 해제
-  expect(optionsTotal).toHaveTextContent(`500원`);
+    // 저녁 식사 옵션 제거
+    await findAndClickCheckbox(user, OPTIONS.DINNER);
+    expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
+  });
 });
 
-describe("total price of goods and options", () => {
-  test("total price starts with 0 and updates when adding one product", async () => {
-    const user = userEvent.setup();
-
-    render(<OrderPage />);
-
+describe("상품과 옵션의 총 금액 계산", () => {
+  test("상품 하나를 추가했을 때 총 금액이 올바르게 계산된다", async () => {
+    const user = setupTest(<OrderPage />);
     const total = screen.getByText("총 금액", { exact: false });
-    expect(total).toHaveTextContent(`0원`);
+    
+    expect(total).toHaveTextContent(formatPrice(0));
 
-    const americaInput = await screen.findByRole("spinbutton", {
-      name: "America",
-    });
-    await user.clear(americaInput);
-    await user.type(americaInput, "1");
-
-    expect(total).toHaveTextContent(`1,000원`);
+    await findAndTypeInput(user, PRODUCTS.AMERICA, "1");
+    expect(total).toHaveTextContent(formatPrice(PRICES.PRODUCT_UNIT));
   });
 
-  test("Updating total price when adding one option", async () => {
-    const user = userEvent.setup();
-
-    render(<OrderPage />);
+  test("옵션 하나를 추가했을 때 총 금액이 올바르게 계산된다", async () => {
+    const user = setupTest(<OrderPage />);
     const total = screen.getByText("총 금액", { exact: false });
 
-    const insuranceCheckbox = await screen.findByRole("checkbox", {
-      name: "Insurance",
-    });
-    await user.click(insuranceCheckbox);
-    expect(total).toHaveTextContent(`500원`);
+    await findAndClickCheckbox(user, OPTIONS.INSURANCE);
+    expect(total).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
   });
 
-  test("Updating total price when removing option and product", async () => {
-    const user = userEvent.setup();
-
-    render(<OrderPage />);
+  test("옵션과 상품을 추가하고 제거할 때 총 금액이 올바르게 계산된다", async () => {
+    const user = setupTest(<OrderPage />);
     const total = screen.getByText("총 금액", { exact: false });
 
-    const insuranceCheckbox = await screen.findByRole("checkbox", {
-      name: "Insurance",
-    });
-    await user.click(insuranceCheckbox);
+    // 보험 옵션 추가
+    await findAndClickCheckbox(user, OPTIONS.INSURANCE);
 
-    const americaInput = await screen.findByRole("spinbutton", {
-      name: "America",
-    });
-    await user.clear(americaInput);
-    await user.type(americaInput, "3");
+    // 상품 3개 추가 후 1개로 수정
+    await findAndTypeInput(user, PRODUCTS.AMERICA, "3");
+    await findAndTypeInput(user, PRODUCTS.AMERICA, "1");
 
-    await user.clear(americaInput);
-    await user.type(americaInput, "1");
-
-    expect(total).toHaveTextContent(`1,500원`);
+    const expectedTotal = PRICES.PRODUCT_UNIT + PRICES.OPTION_UNIT;
+    expect(total).toHaveTextContent(formatPrice(expectedTotal));
   });
 });
