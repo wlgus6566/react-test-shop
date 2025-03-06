@@ -1,6 +1,8 @@
-import { render, screen } from "../../../test-utils";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Type from "../Type";
+import { OrderContextProvider } from "../../../contexts/OrderContext";
+import { WishlistProvider } from "../../../contexts/WishlistContext";
 
 // 상수 정의
 const PRODUCTS = {
@@ -47,17 +49,28 @@ const getTotalText = (type) => {
 
 const formatPrice = (price) => `${price.toLocaleString()}원`;
 
+// 렌더링 헬퍼 함수 수정
+const renderWithProviders = (ui) => {
+  return render(
+    <WishlistProvider>
+      <OrderContextProvider>
+        {ui}
+      </OrderContextProvider>
+    </WishlistProvider>
+  );
+};
+
 describe("상품 및 옵션 선택 테스트", () => {
     describe("상품 선택 테스트", () => {
         test("초기 상품 가격은 0원이다", () => {
-            render(<Type orderType="products" />);
+            renderWithProviders(<Type orderType="products" />);
             const total = getTotalText("products");
             expect(total).toHaveTextContent("총 상품 가격: 0원");
         });
 
         test("상품 개수 변경 시 총 가격이 올바르게 계산된다", async () => {
             const user = userEvent.setup();
-            render(<Type orderType="products" />);
+            renderWithProviders(<Type orderType="products" />);
             const testCases = [
                 { product: "America", quantity: "2", expected: 2000 },
                 { product: "America", quantity: "3", expected: 3000 },
@@ -77,14 +90,14 @@ describe("상품 및 옵션 선택 테스트", () => {
 
     describe("옵션 선택 테스트", () => {
         test("초기 옵션 가격은 0원이다", () => {
-            render(<Type orderType="options" />);
+            renderWithProviders(<Type orderType="options" />);
             const total = getTotalText("options");
             expect(total).toHaveTextContent("총 옵션 가격: 0원");
         });
 
         test("옵션 체크박스 토글 시 총 가격이 올바르게 계산된다", async () => {
             const user = userEvent.setup();
-            render(<Type orderType="options" />);
+            renderWithProviders(<Type orderType="options" />);
             const total = getTotalText("options");
 
             // Insurance 선택

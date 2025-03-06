@@ -1,6 +1,8 @@
-import { render, screen } from "../../../test-utils";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Type from "../Type";
+import { OrderContextProvider } from "../../../contexts/OrderContext";
+import { WishlistProvider } from "../../../contexts/WishlistContext";
 import OrderPage from "../OrderPage";
 
 // 상수 정의
@@ -19,10 +21,21 @@ const OPTIONS = {
   DINNER: 'Dinner'
 };
 
+// 렌더링 헬퍼 함수 수정
+const renderWithProviders = (ui) => {
+  return render(
+    <WishlistProvider>
+      <OrderContextProvider>
+        {ui}
+      </OrderContextProvider>
+    </WishlistProvider>
+  );
+};
+
 // 테스트 헬퍼 함수
 const setupTest = (component) => {
   const user = userEvent.setup();
-  render(component);
+  renderWithProviders(component);
   return user;
 };
 
