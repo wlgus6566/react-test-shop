@@ -4,20 +4,18 @@ import ErrorBanner from "../../components/ErrorBanner";
 import { OrderContext } from "../../contexts/OrderContext";
 
 function CompletePage({ setStep }) {
-    const [{ userPoints }, , resetOrderDatas, , getOrderData] = useContext(OrderContext);
+    const [{ userPoints }, , resetOrderDatas] = useContext(OrderContext);
     const [orderHistory, setOrderHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
     useEffect(() => {
-        // ✅ JSON 변환된 주문 데이터를 사용
-        const orderData = getOrderData();
-        orderCompleted(orderData);
+        fetchOrderHistory();
     }, []);
 
-    const orderCompleted = async (orderData) => {
+    const fetchOrderHistory = async () => {
         try {
-            let response = await axios.post("http://localhost:5003/order", orderData);
+            const response = await axios.get("http://localhost:5003/order-history");
             setOrderHistory(response.data);
             setLoading(false);
         } catch (error) {
@@ -54,27 +52,61 @@ function CompletePage({ setStep }) {
     ));
 
     if (loading) {
-        return <div>loading</div>;
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
     } else {
         return (
-            <div style={{ textAlign: "center" }}>
-                <h2>주문이 성공했습니다.</h2>
-                <h3>남은 포인트: {userPoints !== undefined ? userPoints : 0}원</h3> {/* ✅ NaN 방지 */}
-                <h3>지금까지 모든 주문</h3>
-                <table style={{ margin: "auto" }}>
-                    <tbody>
-                    <tr>
-                        <th>주문 번호</th>
-                        <th>주문 가격</th>
-                    </tr>
-                    {orderTable}
-                    </tbody>
-                </table>
-                <button onClick={handleClick}>첫페이지로</button>
-                <br /><br />
-                <button onClick={clearOrderHistory} style={{ backgroundColor: "red", color: "white" }}>
-                    주문 내역 초기화
-                </button> {/* ✅ 주문 내역 초기화 버튼 추가 */}
+            <div className="container py-5">
+                <div className="card shadow-sm">
+                    <div className="card-body">
+                        <div className="text-center mb-4">
+                            <div className="display-1 text-success mb-3">✓</div>
+                            <h2 className="card-title mb-3">주문이 성공했습니다!</h2>
+                            <div className="alert alert-info">
+                                <h5 className="mb-0">
+                                    남은 포인트: <strong>{userPoints !== undefined ? userPoints.toLocaleString() : 0}원</strong>
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <h3 className="text-center mb-3">주문 내역</h3>
+                            <div className="table-responsive">
+                                <table className="table table-hover">
+                                    <thead className="table-light">
+                                        <tr>
+                                            <th scope="col">주문 번호</th>
+                                            <th scope="col">주문 금액</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {orderTable}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div className="d-flex justify-content-center gap-3">
+                            <button 
+                                className="btn btn-primary"
+                                onClick={handleClick}
+                            >
+                                첫페이지로
+                            </button>
+                            <button 
+                                className="btn btn-danger"
+                                onClick={clearOrderHistory}
+                            >
+                                주문 내역 초기화
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

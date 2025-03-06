@@ -37,9 +37,16 @@ export const handlers = [
   // POST /order 요청 핸들링
   http.post("http://localhost:5003/order", async ({ request }) => {
     console.log("MSW: Intercepted /order request", request);
-    let dummyData = [{ orderNumber: 2131234324, price: 2000 }];
     await delay(100);
-    return HttpResponse.json(dummyData);
+    return HttpResponse.json({ orderNumber: 2131234324 });
+  }),
+
+  // GET /order-history 요청 핸들링
+  http.get("http://localhost:5003/order-history", () => {
+    return HttpResponse.json([
+      { orderNumber: 2131234324, price: 2000 },
+      { orderNumber: 2131234325, price: 3000 }
+    ]);
   }),
 
 ];

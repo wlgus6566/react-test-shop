@@ -29,12 +29,15 @@ app.get('/options', (req, res) => {
 let orderHistory = [];
 
 app.post('/order', (req, res) => {
-  console.log('hehe')
   const orderNumber = Math.floor(Math.random() * 1000000);
-  let order = {price: req.body.totals.total , orderNumber};
+  let order = {price: req.body.totals.total, orderNumber};
   orderHistory.push(order);
-  res.status(201).json( orderHistory )
-})
+  res.status(201).json({ orderNumber }); // 새로 생성된 주문 번호만 반환
+});
+
+app.get('/order-history', (req, res) => {
+  res.status(200).json(orderHistory);
+});
 
 app.delete('/order-history', (req, res) => {
   orderHistory = []; // ✅ 주문 기록 초기화

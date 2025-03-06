@@ -7,7 +7,7 @@ function OrderPage({ setStep }) {
 
     return (
         <div>
-            <h1 className="text-center mb-4">🛫 여행 상품 주문</h1>
+            <h1 className="text-center mb-4">🛫 여행 상품  주문</h1>
             <div className="row">
                 <div className="col-md-6">
                     <Type orderType="products" />
