@@ -11,8 +11,6 @@ function App() {
         <OrderContextProvider>
             <div className="container mt-5">
                 <div className="card p-4 shadow-lg">
-
-                    
                     {step === 0 && <OrderPage setStep={setStep} />}
                     {step === 1 && <SummaryPage setStep={setStep} />}
                     {step === 2 && <CompletePage setStep={setStep} />}
