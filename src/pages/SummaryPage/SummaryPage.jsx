@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { OrderContext } from "../../contexts/OrderContext";
 import { processPayment } from "../../utils/processPayment";
-import "./style/SummaryPage.css";
+import "./SummaryPage.css";
 
 const SummaryPage = ({ setStep }) => {
     const [{ totals, userPoints, products, options }, , , deductPoints, getOrderData] = useContext(OrderContext);
@@ -152,4 +152,4 @@ const SummaryPage = ({ setStep }) => {
     );
 };
 
-export default SummaryPage;
+export default SummaryPage; 
