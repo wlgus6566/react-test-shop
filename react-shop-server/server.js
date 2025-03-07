@@ -21,7 +21,27 @@ const travelDataRaw = fs.readFileSync('./travel.json', 'utf-8');
 const travelData = JSON.parse(travelDataRaw);
 
 const SECRET_KEY = 'your-secret-key-here';
+const USERS_FILE = './users.json';
+
+// 사용자 데이터 로드
 let users = [];
+try {
+  if (fs.existsSync(USERS_FILE)) {
+    const usersData = fs.readFileSync(USERS_FILE, 'utf-8');
+    users = JSON.parse(usersData);
+  }
+} catch (error) {
+  console.error('Error loading users data:', error);
+}
+
+// 사용자 데이터 저장 함수
+const saveUsers = () => {
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (error) {
+    console.error('Error saving users data:', error);
+  }
+};
 
 // 사용자 인증 미들웨어
 const authenticateToken = (req, res, next) => {
@@ -59,6 +79,7 @@ app.post('/register', async (req, res) => {
     };
     
     users.push(user);
+    saveUsers(); // 사용자 데이터 저장
     res.status(201).json({ message: '회원가입이 완료되었습니다.' });
   } catch (error) {
     res.status(500).json({ message: '서버 오류가 발생했습니다.' });

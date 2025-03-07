@@ -2,6 +2,19 @@ import { http, delay, HttpResponse } from "msw";
 
 // MSW에서 http://localhost:5003/products 요청을 가로채기
 export const handlers = [
+  // 로그인 API 모킹
+  http.post("http://localhost:5003/login", async () => {
+    await delay(100);
+    return HttpResponse.json({
+      token: "mock-jwt-token",
+      user: {
+        id: 1,
+        username: "Mozelle34",
+        points: 5000
+      }
+    });
+  }),
+
   // GET /products 요청 핸들링
   http.get("http://localhost:5003/products", () => {
     return HttpResponse.json([
