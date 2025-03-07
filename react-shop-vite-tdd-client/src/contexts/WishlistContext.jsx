@@ -2,8 +2,8 @@ import { createContext, useState, useContext } from 'react';
 
 export const WishlistContext = createContext();
 
-export function WishlistProvider({ children }) {
-    const [wishlist, setWishlist] = useState([]);
+export function WishlistProvider({ children, initialItems = [] }) {
+    const [wishlist, setWishlist] = useState(initialItems);
 
     const addToWishlist = (product) => {
         setWishlist(prev => {
@@ -23,7 +23,12 @@ export function WishlistProvider({ children }) {
     };
 
     return (
-        <WishlistContext.Provider value={{ wishlist, addToWishlist, removeFromWishlist, isInWishlist }}>
+        <WishlistContext.Provider value={{ 
+            wishlist, 
+            addToWishlist, 
+            removeFromWishlist, 
+            isInWishlist 
+        }}>
             {children}
         </WishlistContext.Provider>
     );
