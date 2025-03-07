@@ -70,13 +70,13 @@ describe("상품 가격 계산 테스트", () => {
     for (const { value, expected } of testCases) {
       await findAndTypeInput(user, PRODUCTS.AMERICA, value);
       expect(productsTotal).toHaveTextContent(formatPrice(expected));
-    }
+    }  
   });
 });
 
 describe("옵션 가격 계산", () => {
   test("옵션이 변경될 때 총 옵션 가격이 올바르게 업데이트된다", async () => {
-    const user = setupTest(<Type orderType="options" />);
+    const user = setupTest(<Type orderType="optio ns" />);
     const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
     
     expect(optionsTotal).toHaveTextContent(formatPrice(0));
