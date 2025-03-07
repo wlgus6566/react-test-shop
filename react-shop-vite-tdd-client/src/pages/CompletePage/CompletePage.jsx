@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useEffect, useContext, useState } from "react";
+import { orderApi } from "../../api/orderApi";
 import ErrorBanner from "../../components/ErrorBanner";
 import { OrderContext } from "../../contexts/OrderContext";
 
@@ -15,8 +15,8 @@ function CompletePage({ setStep }) {
 
     const fetchOrderHistory = async () => {
         try {
-            const response = await axios.get("http://localhost:5003/order-history");
-            setOrderHistory(response.data);
+            const data = await orderApi.getOrderHistory();
+            setOrderHistory(data);
             setLoading(false);
         } catch (error) {
             setError(true);
@@ -26,7 +26,7 @@ function CompletePage({ setStep }) {
     // ✅ 주문 내역 초기화 함수 추가
     const clearOrderHistory = async () => {
         try {
-            await axios.delete("http://localhost:5003/order-history");
+            await orderApi.clearOrderHistory();
             setOrderHistory([]); // ✅ 프론트에서도 주문 내역 초기화
             console.log("✅ 주문 내역 초기화 완료");
         } catch (error) {

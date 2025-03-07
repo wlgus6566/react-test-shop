@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
-import axios from "axios";
 import { OrderContext } from "../../contexts/OrderContext";
 import { processPayment } from "../../utils/processPayment";
+import { orderApi } from "../../api/orderApi";
 import "./style/SummaryPage.css";
 
 const SummaryPage = ({ setStep }) => {
@@ -53,18 +53,8 @@ const SummaryPage = ({ setStep }) => {
             const orderData = getOrderData();
             console.log("📌 전송할 데이터:", JSON.stringify(orderData, null, 2));
 
-            // 토큰을 헤더에 포함하여 요청
-            const token = localStorage.getItem('token');
-            const response = await axios.post(
-                "http://localhost:5003/order",
-                orderData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-            console.log("✅ 주문 완료:", response.data);
+            const response = await orderApi.createOrder(orderData);
+            console.log("✅ 주문 완료:", response);
 
             setStep(2);
         } catch (e) {
