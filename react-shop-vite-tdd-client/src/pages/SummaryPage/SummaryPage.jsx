@@ -131,7 +131,7 @@ const SummaryPage = ({ setStep }) => {
                 </div>
 
                 <button
-                    disabled={!checked || isSubmitting || !!error}
+                    disabled={!checked || !!error}
                     type="submit"
                     className="submit-button mt-3"
                 >

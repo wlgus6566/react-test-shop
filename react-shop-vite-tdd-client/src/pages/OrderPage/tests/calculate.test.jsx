@@ -76,7 +76,7 @@ describe("상품 가격 계산 테스트", () => {
 
 describe("옵션 가격 계산", () => {
   test("옵션이 변경될 때 총 옵션 가격이 올바르게 업데이트된다", async () => {
-    const user = setupTest(<Type orderType="optio ns" />);
+    const user = setupTest(<Type orderType="options" />);
     const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
     
     expect(optionsTotal).toHaveTextContent(formatPrice(0));

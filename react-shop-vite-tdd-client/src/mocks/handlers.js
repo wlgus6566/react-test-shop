@@ -48,4 +48,8 @@ export const handlers = [
     ]);
   }),
 
+  // DELETE /order-history 요청 핸들링 추가
+  http.delete("http://localhost:5003/order-history", () => {
+    return HttpResponse.json({ success: true });
+  }),
 ];

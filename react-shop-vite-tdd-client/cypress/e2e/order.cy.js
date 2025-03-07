@@ -4,20 +4,23 @@ describe("로컬 프로젝트 테스트", () => {
   });
 
   /* ==== Test Created with Cypress Studio ==== */
-  it('order process', function() {
+
+
+  it("주문 프로세스", function() {
     /* ==== Generated with Cypress Studio ==== */
     cy.visit('/');
+    /* ==== End Cypress Studio ==== */
     /* ==== Generated with Cypress Studio ==== */
-    cy.get('.p-4').click();
-    cy.get('#America').clear();
-    cy.get('#America').type('2');
-    cy.get('#England').clear('4');
-    cy.get('#England').type('4');
+    cy.get('#America').click();
+    cy.get('#America').click();
+    cy.get('#England').click();
+    cy.get('#Portland').click();
+    cy.get('#Insurance-option').check();
     cy.get('#FirstClass-option').check();
     cy.get('.btn').click();
     cy.get('#usePointsCheckbox').check();
-    cy.get('#usedPointsInput').clear('3');
-    cy.get('#usedPointsInput').type('3000');
+    cy.get('#usedPointsInput').clear('0');
+    cy.get('#usedPointsInput').type('5000');
     cy.get('#confirmCheckbox').check();
     cy.get('.submit-button').click();
     cy.get('.btn-primary').click();
