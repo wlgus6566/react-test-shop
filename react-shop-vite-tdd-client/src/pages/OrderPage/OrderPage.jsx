@@ -17,7 +17,7 @@ function OrderPage({ setStep }) {
                 </div>
             </div>
             <div className="text-center mt-4">
-                <h2 className="fw-bold">총 금액: {totals.total.toLocaleString()}원</h2>
+                <h2 className="fw-bold">총 금액: {isNaN(totals.total) ? 0 : totals.total.toLocaleString()}원</h2>
                 <button className="btn btn-primary btn-lg mt-3" onClick={() => setStep(1)}>
                     주문하기
                 </button>

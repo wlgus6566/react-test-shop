@@ -12,6 +12,7 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
     "playwright": "playwright test",
+    "playwright:ui": "playwright test --ui",
     "playwright:dev": "start-server-and-test dev http://localhost:3000 playwright"
   },
   "dependencies": {

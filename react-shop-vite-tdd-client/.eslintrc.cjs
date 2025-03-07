@@ -1,8 +1,10 @@
-const vitest = require("eslint-plugin-vitest");
-
 module.exports = {
   root: true,
-  env: { browser: true, es2020: true },
+  env: {
+    browser: true,
+    es2020: true,
+    "cypress/globals": true, // Cypress 환경 추가
+  },
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -11,20 +13,7 @@ module.exports = {
     "plugin:testing-library/react",
     "plugin:vitest/recommended",
   ],
-  ignorePatterns: ["dist", ".eslintrc.cjs"],
-  parserOptions: { ecmaVersion: "latest", sourceType: "module" },
-  settings: { react: { version: "18.2" } },
-  plugins: ["react-refresh"],
-  rules: {
-    "react-refresh/only-export-components": [
-      "warn",
-      { allowConstantExport: true },
-    ],
-    "no-unused-vars": "warn", // warning, not error
-    "vitest/expect-expect": "off", // distracting red squiggles while writing tests
-    "react/prop-types": "off", // turn off props validation
-  },
-  globals: {
-    ...vitest.environments.env.globals,
-  },
+  // ... 나머지 설정
+  plugins: ["react-refresh", "cypress"], // Cypress 플러그인 추가
+  // ...
 };

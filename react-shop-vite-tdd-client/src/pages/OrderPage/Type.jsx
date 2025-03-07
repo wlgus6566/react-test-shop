@@ -30,7 +30,10 @@ function Type({ orderType }) {
 
     const ItemComponent = orderType === "products" ? Products : Options;
     const orderTypeKorean = orderType === "products" ? "상품" : "옵션";
-    const totalPrice = totals[orderType] ?? 0; // ✅ undefined 방지
+    
+    // totalPrice가 undefined, NaN, null인 경우 0으로 처리
+    const totalPrice = totals[orderType] || 0;
+    const formattedPrice = isNaN(totalPrice) ? 0 : totalPrice;
 
     return (
         <div className="card p-3 shadow-sm">
@@ -38,8 +41,8 @@ function Type({ orderType }) {
             <p className="text-center">개별 가격</p>
             <h4 className="text-center fw-bold text-danger">
                 {orderType === "products"
-                    ? `총 상품 가격: ${totalPrice.toLocaleString()}원`
-                    : `총 옵션 가격: ${totalPrice.toLocaleString()}원`}
+                    ? `총 상품 가격: ${formattedPrice.toLocaleString()}원`
+                    : `총 옵션 가격: ${formattedPrice.toLocaleString()}원`}
             </h4>
             <div className="row mt-3 type">
                 {items.map((item) => (
