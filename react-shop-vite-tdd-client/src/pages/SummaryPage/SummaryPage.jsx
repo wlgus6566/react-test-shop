@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { OrderContext } from "../../contexts/OrderContext";
 import { orderApi } from "../../api/orderApi";
-import { paymentService } from "../../services/PaymentService";
+import { validatePointsInput, processPayment } from "../../services/PaymentService";
 import "./style/SummaryPage.css";
 
 const SummaryPage = ({ setStep }) => {
@@ -29,10 +29,10 @@ const SummaryPage = ({ setStep }) => {
     // ✅ 포인트 입력 시 실시간 유효성 검사
     const handlePointsChange = (event) => {
         const pointsInput = parseInt(event.target.value, 10) || 0;
-        const { isValid, message } = paymentService.validatePointsInput({
+        const { isValid, message } = validatePointsInput({
             userPoints,
             totalPrice,
-            pointsInput
+            pointsInput: pointsInput
         });
 
         setError(message);
@@ -46,11 +46,11 @@ const SummaryPage = ({ setStep }) => {
 
         try {
             // ✅ 결제 처리
-            const paymentResult = await paymentService.processPayment({
+            const paymentResult = await processPayment({
                 userPoints,
                 totalPrice,
                 usePoints,
-                usedPoints
+                usedPoints: usedPoints
             });
 
             if (paymentResult.success) {

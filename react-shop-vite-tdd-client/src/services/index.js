@@ -1,1 +1,1 @@
-export { paymentService } from './PaymentService'; 
+export { validatePayment, processPayment, validatePointsInput } from './PaymentService'; 
