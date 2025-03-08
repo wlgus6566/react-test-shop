@@ -34,7 +34,7 @@ export default function LoginPage({ setIsAuthenticated }) {
         <div className="login-container">
             <div className="login-box">
                 <h2>로그인</h2>
-                {error && <div className="alert alert-danger">{error}</div>}
+                {error && <div className="alert alert-danger" role="alert">{error}</div>}
                 <form onSubmit={handleLogin}>
                     <div className="form-group">
                         <label htmlFor="username">아이디</label>
