@@ -9,9 +9,10 @@ export default defineConfig({
     environment: "jsdom",
     // this points to the setup file
     setupFiles: "./src/setupTests.js",
+    exclude: ['playwright-test/**', 'tests-examples/**'],
     // you might want to disable it, if you don't have tests that rely on CSS
     // since parsing CSS is slow
-    css: true,
+    css: true
   },
   server: {
     host: 'localhost',

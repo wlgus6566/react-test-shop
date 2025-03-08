@@ -1,10 +1,10 @@
 # Playwright 테스트 작성 가이드
+
 ## 1. 프로젝트 구조
 ```
-tests/
-├── e2e/                 # E2E 테스트
-├── integration/         # 통합 테스트
-├── fixtures/            # 테스트 데이터
+react-shop-vite-tdd-client/
+├── playwright-test/            
+│   ├── e2e/             # Playwright E2E 테스트
 ```
 
 ## 2. 테스트 파일 작성 규칙
@@ -132,17 +132,4 @@ test('API 에러 발생 시 에러 메시지 표시', async ({ page }) => {
   await expect(page.getByRole('alert')).toHaveText('서버 오류가 발생했습니다.');
 });
 ```
-
-## 8. 인증 상태 관리 (storageState)
-### 인증이 필요한 테스트에서 사용
-```typescript
-// tests/e2e/protected-route.spec.ts
-import { test } from '@playwright/test';
-
-test.use({ storageState: './tests/fixtures/auth.json' });
-
-test('인증이 필요한 페이지 접근', async ({ page }) => {
-  await page.goto('/dashboard');
-  // ... 테스트 로직
-});
 ```
