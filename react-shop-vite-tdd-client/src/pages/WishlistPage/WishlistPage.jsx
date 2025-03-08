@@ -13,7 +13,6 @@ function WishlistPage() {
         <button 
           className="btn btn-primary"
           onClick={() => navigate("/")}
-          data-testid="browse-products-button"
         >
           상품 둘러보기
         </button>
@@ -32,18 +31,12 @@ function WishlistPage() {
                 src={`http://localhost:5003${product.imagePath}`}
                 className="card-img-top"
                 alt={product.name}
+                data-testid={`product-image-${product.id}`}
                 style={{ height: "200px", objectFit: "cover" }}
               />
               <div className="card-body">
                 <h3 className="card-title h5">{product.name}</h3>
                 <div className="d-flex justify-content-between">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => navigate(`/order`)}
-                    aria-label={`${product.name} 주문하기`}
-                  >
-                    주문하기
-                  </button>
                   <button
                     className="btn btn-outline-danger"
                     onClick={() => removeFromWishlist(product.name)}
@@ -61,4 +54,4 @@ function WishlistPage() {
   );
 }
 
-export default WishlistPage;
+export default WishlistPage; 
