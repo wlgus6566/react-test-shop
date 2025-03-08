@@ -3,9 +3,13 @@
 ## 1. 프로젝트 구조
 ```
 react-shop-vite-tdd-client/
-├── playwright-test/            
-│   ├── e2e/             # Playwright E2E 테스트
+├── playwright/           # Playwright 소스 폴더
+│   ├── e2e/              # Playwright E2E 테스트 폴더 
+│   ├── example/          # Playwright E2E 테스트 예시 소스 폴더
+│   │   ├── demo.spec.js  # Playwright E2E 테스트 예시 파일
 ```
+Playwright e2e 테스트파일들은 모두 react-shop-vite-tdd-client/playwright/e2e 폴더에 위치시킵니다.
+
 
 ## 2. 테스트 파일 작성 규칙
 ### 파일 명명 규칙

@@ -11,7 +11,9 @@ export default defineConfig({
     setupFiles: "./src/setupTests.js",
     // you might want to disable it, if you don't have tests that rely on CSS
     // since parsing CSS is slow
-    css: true
+    css: true,
+    include: ['**/*.{test,spec}.{js,jsx}'],
+    exclude: ['**/playwright/**', '**/node_modules/**']
   },
   server: {
     host: 'localhost',
