@@ -1,3 +1,4 @@
+// 포인트를 사용한 결제 시스템
 export function processPayment(userPoints, totalPrice, usedPoints = 0) {
     if (usedPoints > userPoints) {
         const error = new Error("보유 포인트보다 많은 금액을 사용할 수 없습니다.");

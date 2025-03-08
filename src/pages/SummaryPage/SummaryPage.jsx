@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { OrderContext } from "../../contexts/OrderContext";
 import { orderApi } from "../../api/orderApi";
-import { paymentService } from "../../services/PaymentService";
+import { paymentService } from "../../../react-shop-vite-tdd-client/src/services/PaymentService";
 import "./style/SummaryPage.css";
 
 const SummaryPage = ({ setStep }) => {
@@ -45,7 +45,7 @@ const SummaryPage = ({ setStep }) => {
         setIsSubmitting(true);
 
         try {
-            // ✅ 결제 처리
+            // 결제 처리
             const paymentResult = await paymentService.processPayment({
                 userPoints,
                 totalPrice,
@@ -61,7 +61,7 @@ const SummaryPage = ({ setStep }) => {
                 };
 
                 const response = await orderApi.createOrder(orderData);
-                console.log("✅ 주문 완료:", response);
+                console.log(" 주문 완료:", response);
                 setStep(2);
             }
         } catch (e) {

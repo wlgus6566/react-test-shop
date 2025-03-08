@@ -7,7 +7,7 @@ export const orderApi = {
         return response.data;
     },
 
-    // 주문 내역 조회
+    // 주문 내역 조회 
     getOrderHistory: async () => {
         const response = await api.get('/order-history');
         return response.data;
