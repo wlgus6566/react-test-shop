@@ -7,10 +7,33 @@ export default function LoginPage({ setIsAuthenticated }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [validationErrors, setValidationErrors] = useState({
+        username: '',
+        password: ''
+    });
     const navigate = useNavigate();
+
+    const validateForm = () => {
+        const errors = {
+            username: '',
+            password: ''
+        };
+        
+        if (!username) {
+            errors.username = '아이디를 입력해주세요.';
+        }
+        if (!password) {
+            errors.password = '비밀번호를 입력해주세요.';
+        }
+
+        setValidationErrors(errors);
+        return !errors.username && !errors.password;
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
+
         try {
             const response = await axios.post('http://localhost:5003/login', {
                 username,
@@ -35,28 +58,42 @@ export default function LoginPage({ setIsAuthenticated }) {
             <div className="login-box">
                 <h2>로그인</h2>
                 {error && <div className="alert alert-danger" role="alert">{error}</div>}
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleLogin} noValidate>
                     <div className="form-group">
                         <label htmlFor="username">아이디</label>
                         <input
                             type="text"
                             id="username"
-                            className="form-control"
+                            className={`form-control ${validationErrors.username ? 'is-invalid' : ''}`}
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
+                            onChange={(e) => {
+                                setUsername(e.target.value);
+                                setValidationErrors(prev => ({...prev, username: ''}));
+                            }}
                         />
+                        {validationErrors.username && (
+                            <div className="validation-error" data-testid="username-error">
+                                {validationErrors.username}
+                            </div>
+                        )}
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">비밀번호</label>
                         <input
                             type="password"
                             id="password"
-                            className="form-control"
+                            className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                setValidationErrors(prev => ({...prev, password: ''}));
+                            }}
                         />
+                        {validationErrors.password && (
+                            <div className="validation-error" data-testid="password-error">
+                                {validationErrors.password}
+                            </div>
+                        )}
                     </div>
                     <button type="submit" className="btn btn-primary w-100">
                         로그인

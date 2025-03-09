@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "username": "testuser",
+    "password": "$2a$10$ie94XDxJOsVWqHENs.wqYekEbePhKcbuhBMqd1FU/iiLjftTBbPV2",
+    "points": 5000
+  },
+  {
+    "id": 2,
+    "username": "testuser_1741494263474",
+    "password": "$2a$10$q/9diRSI69xCWWV/ZCoHT.3XN4/h1mlmF8hi6ST2I8fl0w2vp74jS",
+    "points": 5000
+  },
+  {
+    "id": 3,
+    "username": "testuser_1741494326394",
+    "password": "$2a$10$h3GmFAK/kbYnSpxUOGVkXOmhJLlYj5qiGBFDQEgV28/HSyEINSui6",
+    "points": 5000
+  },
+  {
+    "id": 4,
+    "username": "wlgus6566",
+    "password": "$2a$10$d/oH6IrH9TsdBjCUuVpNBu/0h22o.nE0D9za/1TfCZKuAVf0YxQ0u",
+    "points": 5000
+  }
+]
