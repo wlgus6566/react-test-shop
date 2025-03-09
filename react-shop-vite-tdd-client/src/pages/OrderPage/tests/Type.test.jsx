@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import Type from "../Type";
 import { OrderContextProvider } from "../../../contexts/OrderContext";
 import { WishlistProvider } from "../../../contexts/WishlistContext";
+import { server } from "../../../mocks/server";
+import { http } from "msw";
 
 // 상수 정의
 const PRODUCTS = {
@@ -26,6 +28,17 @@ const OPTIONS = {
         price: 500
     }
 };
+
+// API 응답 데이터
+const TEST_PRODUCTS_DATA = [
+    { name: "America", imagePath: "/images/america.jpg", price: 1000 },
+    { name: "England", imagePath: "/images/england.jpg", price: 1000 }
+];
+
+const TEST_OPTIONS_DATA = [
+    { name: "Insurance", imagePath: "/images/insurance.png", price: 500 },
+    { name: "Dinner", imagePath: "/images/dinner.png", price: 500 }
+];
 
 // 헬퍼 함수
 const findAndTypeInput = async (user, name, value) => {
@@ -51,17 +64,25 @@ const formatPrice = (price) => `${price.toLocaleString()}원`;
 
 // 렌더링 헬퍼 함수 수정
 const renderWithProviders = (ui) => {
-  return render(
-    <WishlistProvider>
-      <OrderContextProvider>
-        {ui}
-      </OrderContextProvider>
-    </WishlistProvider>
-  );
+    return render(
+        <WishlistProvider>
+            <OrderContextProvider>
+                {ui}
+            </OrderContextProvider>
+        </WishlistProvider>
+    );
 };
 
 describe("상품 및 옵션 선택 테스트", () => {
     describe("상품 선택 테스트", () => {
+        beforeEach(() => {
+            server.use(
+                http.get("http://localhost:5003/products", () => {
+                    return Response.json(TEST_PRODUCTS_DATA);
+                })
+            );
+        });
+
         test("초기 상품 가격은 0원이다", () => {
             renderWithProviders(<Type orderType="products" />);
             const total = getTotalText("products");
@@ -89,6 +110,14 @@ describe("상품 및 옵션 선택 테스트", () => {
     });
 
     describe("옵션 선택 테스트", () => {
+        beforeEach(() => {
+            server.use(
+                http.get("http://localhost:5003/options", () => {
+                    return Response.json(TEST_OPTIONS_DATA);
+                })
+            );
+        });
+
         test("초기 옵션 가격은 0원이다", () => {
             renderWithProviders(<Type orderType="options" />);
             const total = getTotalText("options");

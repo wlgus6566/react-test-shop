@@ -34,6 +34,7 @@ const renderWithProviders = (ui) => {
 
 // 테스트 헬퍼 함수
 const setupTest = (component) => {
+  //사용자 이벤트 객체(userEvent)를 반환
   const user = userEvent.setup();
   renderWithProviders(component);
   return user;
@@ -41,23 +42,10 @@ const setupTest = (component) => {
 
 const formatPrice = (price) => `${price.toLocaleString()}원`;
 
-const findAndTypeInput = async (user, name, value) => {
-  const input = await screen.findByRole("spinbutton", { name });
-  await user.clear(input);
-  await user.type(input, value);
-  return input;
-};
-
-const findAndClickCheckbox = async (user, name) => {
-  const checkbox = await screen.findByRole("checkbox", { name });
-  await user.click(checkbox);
-  return checkbox;
-};
-
 describe("상품 가격 계산 테스트", () => {
   test("상품 개수를 변경할 때 총 가격이 올바르게 반영된다", async () => {
     const user = setupTest(<Type orderType="products" />);
-    const productsTotal = screen.getByText("총 상품 가격:", { exact: false });
+    const productsTotal = screen.getByText("총 상품 가격", { exact: false });
     
     expect(productsTotal).toHaveTextContent(formatPrice(0));
 
@@ -68,7 +56,9 @@ describe("상품 가격 계산 테스트", () => {
     ];
 
     for (const { value, expected } of testCases) {
-      await findAndTypeInput(user, PRODUCTS.AMERICA, value);
+      const input = await screen.findByRole("spinbutton", { name: PRODUCTS.AMERICA });
+      await user.clear(input);
+      await user.type(input, value);
       expect(productsTotal).toHaveTextContent(formatPrice(expected));
     }  
   });
@@ -77,20 +67,22 @@ describe("상품 가격 계산 테스트", () => {
 describe("옵션 가격 계산", () => {
   test("옵션이 변경될 때 총 옵션 가격이 올바르게 업데이트된다", async () => {
     const user = setupTest(<Type orderType="options" />);
-    const optionsTotal = screen.getByText("총 옵션 가격:", { exact: false });
+    const optionsTotal = screen.getByText("총 옵션 가격", { exact: false });
     
     expect(optionsTotal).toHaveTextContent(formatPrice(0));
 
     // 보험 옵션 추가
-    await findAndClickCheckbox(user, OPTIONS.INSURANCE);
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.INSURANCE });
+    await user.click(insuranceCheckbox);
     expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
 
     // 저녁 식사 옵션 추가
-    await findAndClickCheckbox(user, OPTIONS.DINNER);
+    const dinnerCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.DINNER });
+    await user.click(dinnerCheckbox);
     expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT * 2));
 
     // 저녁 식사 옵션 제거
-    await findAndClickCheckbox(user, OPTIONS.DINNER);
+    await user.click(dinnerCheckbox);
     expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
   });
 });
@@ -102,7 +94,9 @@ describe("상품과 옵션의 총 금액 계산", () => {
     
     expect(total).toHaveTextContent(formatPrice(0));
 
-    await findAndTypeInput(user, PRODUCTS.AMERICA, "1");
+    const input = await screen.findByRole("spinbutton", { name: PRODUCTS.AMERICA });
+    await user.clear(input);
+    await user.type(input, "1");
     expect(total).toHaveTextContent(formatPrice(PRICES.PRODUCT_UNIT));
   });
 
@@ -110,7 +104,8 @@ describe("상품과 옵션의 총 금액 계산", () => {
     const user = setupTest(<OrderPage />);
     const total = screen.getByText("총 금액", { exact: false });
 
-    await findAndClickCheckbox(user, OPTIONS.INSURANCE);
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.INSURANCE });
+    await user.click(insuranceCheckbox);
     expect(total).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
   });
 
@@ -119,11 +114,15 @@ describe("상품과 옵션의 총 금액 계산", () => {
     const total = screen.getByText("총 금액", { exact: false });
 
     // 보험 옵션 추가
-    await findAndClickCheckbox(user, OPTIONS.INSURANCE);
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.INSURANCE });
+    await user.click(insuranceCheckbox);
 
     // 상품 3개 추가 후 1개로 수정
-    await findAndTypeInput(user, PRODUCTS.AMERICA, "3");
-    await findAndTypeInput(user, PRODUCTS.AMERICA, "1");
+    const input = await screen.findByRole("spinbutton", { name: PRODUCTS.AMERICA });
+    await user.clear(input);
+    await user.type(input, "3");
+    await user.clear(input);
+    await user.type(input, "1");
 
     const expectedTotal = PRICES.PRODUCT_UNIT + PRICES.OPTION_UNIT;
     expect(total).toHaveTextContent(formatPrice(expectedTotal));
