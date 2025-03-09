@@ -135,6 +135,7 @@ export function OrderContextProvider(props) {
       resetOrderDatas,
       deductPoints,
       getOrderData,
+      setUserPoints,
     ];
   }, [orderCounts, totals, userPoints]);
 

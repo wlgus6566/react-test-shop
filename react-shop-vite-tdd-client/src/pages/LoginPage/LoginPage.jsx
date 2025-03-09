@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './style/LoginPage.css';
+import { OrderContext } from '../../contexts/OrderContext';
 
 export default function LoginPage({ setIsAuthenticated }) {
     const [username, setUsername] = useState('');
@@ -12,6 +13,7 @@ export default function LoginPage({ setIsAuthenticated }) {
         password: ''
     });
     const navigate = useNavigate();
+    const [, , , deductPoints, , setUserPoints] = useContext(OrderContext);
 
     const validateForm = () => {
         const errors = {
@@ -46,6 +48,9 @@ export default function LoginPage({ setIsAuthenticated }) {
             
             // 인증 상태 업데이트
             setIsAuthenticated(true);
+
+            // OrderContext에 포인트 설정
+            setUserPoints(response.data.user.points);
 
             navigate('/');
         } catch (error) {
