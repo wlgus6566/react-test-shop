@@ -1,7 +1,7 @@
 import React from "react";
 import { useWishlist } from "../../contexts/WishlistContext";
 
-function Products({ name, imagePath, updateItemCount }) {
+function Products({ name, imagePath, price, updateItemCount }) {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   
   const handleChange = (event) => {
@@ -56,6 +56,7 @@ function Products({ name, imagePath, updateItemCount }) {
           defaultValue={0}
           onChange={handleChange}
         />
+        <div className="ms-4 mt-1">({price.toLocaleString()}원)</div>
       </form>
     </div>
   );

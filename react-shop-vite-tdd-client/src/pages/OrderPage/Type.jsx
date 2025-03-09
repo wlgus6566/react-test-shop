@@ -38,7 +38,6 @@ function Type({ orderType }) {
     return (
         <div className="card p-3 shadow-sm">
             <h2 className="text-center text-primary">{orderTypeKorean} 선택</h2>
-            <p className="text-center">개별 가격</p>
             <h4 className="text-center fw-bold text-danger">
                 {orderType === "products"
                     ? `총 상품 가격: ${formattedPrice.toLocaleString()}원`
@@ -50,6 +49,7 @@ function Type({ orderType }) {
                         <ItemComponent
                             name={item.name}
                             imagePath={item.imagePath}
+                            price={item.price}
                             updateItemCount={(name, count) => updateItemCount(name, count, orderType)}
                         />
                     </div>

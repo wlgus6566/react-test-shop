@@ -1,6 +1,6 @@
 import React from "react";
 
-function Options({ name, updateItemCount }) {
+function Options({ name, price, updateItemCount }) {
     return (
         <div className="form-check">
             <input
@@ -12,8 +12,9 @@ function Options({ name, updateItemCount }) {
                 }}
             />
             <label className="form-check-label ms-2" htmlFor={`${name}-option`}>
-                {name}
+                {name} 
             </label>
+            <div className="ms-4 mt-1">({price.toLocaleString()}원)</div>
         </div>
     );
 }
