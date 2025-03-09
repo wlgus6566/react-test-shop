@@ -1,7 +1,7 @@
 import React from "react";
 import { useWishlist } from "../../contexts/WishlistContext";
 
-function Products({ name, imagePath, price, updateItemCount }) {
+function Products({ name, imagePath, price = 0, updateItemCount }) {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   
   const handleChange = (event) => {
@@ -42,22 +42,26 @@ function Products({ name, imagePath, price, updateItemCount }) {
         src={`http://localhost:5003/${imagePath}`}
         alt={`${name} product`}
       />
-      <form style={{ marginTop: "10px" }}>
-        <label htmlFor={name} style={{ textAlign: "right" }}>
-          {name}
-        </label>
-        <input
-          id={name}
-          style={{ marginLeft: 7 }}
-          type="number"
-          className="form-number"
-          name="quantity"
-          min="0"
-          defaultValue={0}
-          onChange={handleChange}
-        />
-        <div className="ms-4 mt-1">({price.toLocaleString()}원)</div>
-      </form>
+      <div className="mt-3 d-flex flex-column align-items-center">
+        <h5 className="mb-1">{name}</h5>
+        <p className="text-primary mb-2">{price.toLocaleString()}원</p>
+        <div className="mt-1">
+          <label htmlFor={name} className="form-label">
+            {name} 수량
+          </label>
+          <input
+            id={name}
+            type="number"
+            className="form-control"
+            style={{ width: "100px" }}
+            name="quantity"
+            min="0"
+            defaultValue={0}
+            onChange={handleChange}
+            aria-label={`${name} 수량`}
+          />
+        </div>
+      </div>
     </div>
   );
 }

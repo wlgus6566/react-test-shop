@@ -86,7 +86,7 @@ describe("상품 가격 계산 테스트", () => {
     ];
 
     for (const { value, expected } of testCases) {
-      const input = await screen.findByRole("spinbutton", { name: PRODUCTS[0].name });
+      const input = await screen.findByLabelText(`${PRODUCTS[0].name} 수량`);
       await user.clear(input);
       await user.type(input, value);
       expect(productsTotal).toHaveTextContent(formatPrice(expected));
@@ -102,12 +102,12 @@ describe("옵션 가격 계산", () => {
     expect(optionsTotal).toHaveTextContent(formatPrice(0));
 
     // 보험 옵션 추가
-    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[0].name });
+    const insuranceCheckbox = await screen.findByLabelText(OPTIONS[0].name);
     await user.click(insuranceCheckbox);
     expect(optionsTotal).toHaveTextContent(formatPrice(OPTIONS[0].price));
 
     // 저녁 식사 옵션 추가
-    const dinnerCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[1].name });
+    const dinnerCheckbox = await screen.findByLabelText(OPTIONS[1].name);
     await user.click(dinnerCheckbox);
     expect(optionsTotal).toHaveTextContent(formatPrice(OPTIONS[0].price + OPTIONS[1].price));
 
@@ -124,7 +124,7 @@ describe("상품과 옵션의 총 금액 계산", () => {
     
     expect(total).toHaveTextContent(formatPrice(0));
 
-    const input = await screen.findByRole("spinbutton", { name: PRODUCTS[0].name });
+    const input = await screen.findByLabelText(`${PRODUCTS[0].name} 수량`);
     await user.clear(input);
     await user.type(input, "1");
     expect(total).toHaveTextContent(formatPrice(PRODUCTS[0].price));
@@ -134,7 +134,7 @@ describe("상품과 옵션의 총 금액 계산", () => {
     const user = setupTest(<OrderPage />);
     const total = screen.getByText("총 금액", { exact: false });
 
-    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[0].name });
+    const insuranceCheckbox = await screen.findByLabelText(OPTIONS[0].name);
     await user.click(insuranceCheckbox);
     expect(total).toHaveTextContent(formatPrice(OPTIONS[0].price));
   });
@@ -144,11 +144,11 @@ describe("상품과 옵션의 총 금액 계산", () => {
     const total = screen.getByText("총 금액", { exact: false });
 
     // 보험 옵션 추가
-    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[0].name });
+    const insuranceCheckbox = await screen.findByLabelText(OPTIONS[0].name);
     await user.click(insuranceCheckbox);
 
     // 상품 3개 추가 후 1개로 수정
-    const input = await screen.findByRole("spinbutton", { name: PRODUCTS[0].name });
+    const input = await screen.findByLabelText(`${PRODUCTS[0].name} 수량`);
     await user.clear(input);
     await user.type(input, "3");
     await user.clear(input);
