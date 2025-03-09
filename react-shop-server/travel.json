@@ -3,36 +3,43 @@
     {
       "name": "America",
       "imagePath": "/images/america.jpeg",
-      "description": "Good America"
+      "description": "Good America",
+      "price": 1000
     },
     {
       "name": "England",
       "imagePath": "/images/england.jpeg",
-      "description": "Good England"
+      "description": "Good England",
+      "price": 2000
     },
     {
       "name": "Germany",
       "imagePath": "/images/germany.jpeg",
-      "description": "Good Germany"
+      "description": "Good Germany",
+      "price": 1500
     },
     {
       "name": "Portland",
       "imagePath": "/images/portland.jpeg",
-      "description": "Good Portland"
+      "description": "Good Portland",
+      "price": 1200
     }
   ],
   "options" : [
     {
       "name": "Insurance",
-      "description": "안전한 여행을 위해서!"
+      "description": "안전한 여행을 위해서!",
+      "price": 500
     },
     {
       "name": "Dinner",
-      "description": "맛있는 저녁과 함께하는 여행!"
+      "description": "맛있는 저녁과 함께하는 여행!",
+      "price": 500
     },
     {
       "name": "FirstClass",
-      "description": "편안한 비행을 위해서!"
+      "description": "편안한 비행을 위해서!",
+      "price": 1000
     }
   ]
 }

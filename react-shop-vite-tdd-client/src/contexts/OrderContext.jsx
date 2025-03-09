@@ -3,19 +3,14 @@ import { createContext, useState, useMemo, useEffect } from "react";
 // OrderContext 생성
 export const OrderContext = createContext();
 
-// 각 아이템의 단위 가격을 정의
-const pricePerItem = {
-  products: 1000,
-  options: 500,
-};
-
 // 주어진 타입의 소계를 계산하는 함수
-function calculateSubtotal(orderType, orderCounts) {
-  let optionCount = 0;
-  for (const count of orderCounts[orderType].values()) {
-    optionCount += count;
+function calculateSubtotal(orderType, orderCounts, prices) {
+  let total = 0;
+  for (const [itemName, count] of orderCounts[orderType].entries()) {
+    const price = prices[orderType].find(item => item.name === itemName)?.price || 0;
+    total += count * price;
   }
-  return optionCount * pricePerItem[orderType];
+  return total;
 }
 
 // 컨텍스트 Provider 컴포넌트
@@ -33,23 +28,53 @@ export function OrderContextProvider(props) {
     total: 0,
   });
 
-  // ✅ 사용자 포인트 초기값 설정
-  const [userPoints, setUserPoints] = useState(5000);
+  // 서버에서 받아온 가격 정보 저장
+  const [prices, setPrices] = useState({
+    products: [],
+    options: []
+  });
+
+  // 서버에서 상품과 옵션 데이터 가져오기
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const [productsResponse, optionsResponse] = await Promise.all([
+          fetch('http://localhost:5003/products'),
+          fetch('http://localhost:5003/options')
+        ]);
+        
+        const products = await productsResponse.json();
+        const options = await optionsResponse.json();
+        
+        setPrices({
+          products,
+          options
+        });
+      } catch (error) {
+        console.error('Failed to fetch prices:', error);
+      }
+    };
+    
+    fetchPrices();
+  }, []);
+
+  // 사용자 포인트는 로그인 시 서버에서 받아온 값으로 설정됨
+  const [userPoints, setUserPoints] = useState(0);
 
   // ✅ 주문 수량이 변경될 때 총 금액을 다시 계산하는 useEffect
   useEffect(() => {
     if (orderCounts.products.size === 0 && orderCounts.options.size === 0) {
       setTotals({ products: 0, options: 0, total: 0 }); // 🛠 주문 초기화 시 즉시 0으로 설정
     } else {
-      const productsTotal = calculateSubtotal("products", orderCounts);
-      const optionsTotal = calculateSubtotal("options", orderCounts);
+      const productsTotal = calculateSubtotal("products", orderCounts, prices);
+      const optionsTotal = calculateSubtotal("options", orderCounts, prices);
       setTotals({
         products: productsTotal,
         options: optionsTotal,
         total: productsTotal + optionsTotal,
       });
     }
-  }, [orderCounts]); // ⬅ orderCounts 변경될 때마다 실행
+  }, [orderCounts, prices]); // ⬅ orderCounts 변경될 때마다 실행
 
   // Context에서 공유할 값
   const value = useMemo(() => {
@@ -84,7 +109,7 @@ export function OrderContextProvider(props) {
       setTotals({ products: 0, options: 0, total: 0 });
 
       // ✅ 포인트 초기화
-      setUserPoints(5000);
+      setUserPoints(0);
 
       // ✅ 상태 업데이트 후 강제 리렌더링 트리거
       setTimeout(() => {
@@ -93,7 +118,7 @@ export function OrderContextProvider(props) {
     }
     function deductPoints(amount) {
       setUserPoints((prev) => {
-        const currentPoints = Number(prev) || 5000;
+        const currentPoints = Number(prev) || 0;
         const validAmount = Number(amount) || 0;
         return Math.max(0, currentPoints - validAmount);
       });

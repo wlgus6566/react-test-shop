@@ -1,27 +1,58 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import Type from "../Type";
 import { OrderContextProvider } from "../../../contexts/OrderContext";
 import { WishlistProvider } from "../../../contexts/WishlistContext";
 import OrderPage from "../OrderPage";
 
-// 상수 정의
-const PRICES = {
-  PRODUCT_UNIT: 1000,
-  OPTION_UNIT: 500
-};
+// 테스트용 상품과 옵션 데이터
+const PRODUCTS = [
+  {
+    name: 'America',
+    imagePath: '/images/america.jpeg',
+    description: 'Good America',
+    price: 1000
+  },
+  {
+    name: 'England',
+    imagePath: '/images/england.jpeg',
+    description: 'Good England',
+    price: 2000
+  }
+];
 
-const PRODUCTS = {
-  AMERICA: 'America',
-  ENGLAND: 'England'
-};
+const OPTIONS = [
+  {
+    name: 'Insurance',
+    description: '안전한 여행을 위해서!',
+    price: 500
+  },
+  {
+    name: 'Dinner',
+    description: '맛있는 저녁과 함께하는 여행!',
+    price: 500
+  }
+];
 
-const OPTIONS = {
-  INSURANCE: 'Insurance',
-  DINNER: 'Dinner'
-};
+// API 모킹 설정
+beforeEach(() => {
+  // fetch 모킹
+  global.fetch = vi.fn((url) => {
+    if (url.includes('/products')) {
+      return Promise.resolve({
+        json: () => Promise.resolve(PRODUCTS)
+      });
+    }
+    if (url.includes('/options')) {
+      return Promise.resolve({
+        json: () => Promise.resolve(OPTIONS)
+      });
+    }
+  });
+});
 
-// 렌더링 헬퍼 함수 수정
+// 렌더링 헬퍼 함수
 const renderWithProviders = (ui) => {
   return render(
     <WishlistProvider>
@@ -34,7 +65,6 @@ const renderWithProviders = (ui) => {
 
 // 테스트 헬퍼 함수
 const setupTest = (component) => {
-  //사용자 이벤트 객체(userEvent)를 반환
   const user = userEvent.setup();
   renderWithProviders(component);
   return user;
@@ -50,13 +80,13 @@ describe("상품 가격 계산 테스트", () => {
     expect(productsTotal).toHaveTextContent(formatPrice(0));
 
     const testCases = [
-      { value: "1", expected: PRICES.PRODUCT_UNIT },
-      { value: "3", expected: PRICES.PRODUCT_UNIT * 3 },
+      { value: "1", expected: PRODUCTS[0].price },
+      { value: "3", expected: PRODUCTS[0].price * 3 },
       { value: "0", expected: 0 },
     ];
 
     for (const { value, expected } of testCases) {
-      const input = await screen.findByRole("spinbutton", { name: PRODUCTS.AMERICA });
+      const input = await screen.findByRole("spinbutton", { name: PRODUCTS[0].name });
       await user.clear(input);
       await user.type(input, value);
       expect(productsTotal).toHaveTextContent(formatPrice(expected));
@@ -72,18 +102,18 @@ describe("옵션 가격 계산", () => {
     expect(optionsTotal).toHaveTextContent(formatPrice(0));
 
     // 보험 옵션 추가
-    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.INSURANCE });
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[0].name });
     await user.click(insuranceCheckbox);
-    expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
+    expect(optionsTotal).toHaveTextContent(formatPrice(OPTIONS[0].price));
 
     // 저녁 식사 옵션 추가
-    const dinnerCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.DINNER });
+    const dinnerCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[1].name });
     await user.click(dinnerCheckbox);
-    expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT * 2));
+    expect(optionsTotal).toHaveTextContent(formatPrice(OPTIONS[0].price + OPTIONS[1].price));
 
     // 저녁 식사 옵션 제거
     await user.click(dinnerCheckbox);
-    expect(optionsTotal).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
+    expect(optionsTotal).toHaveTextContent(formatPrice(OPTIONS[0].price));
   });
 });
 
@@ -94,19 +124,19 @@ describe("상품과 옵션의 총 금액 계산", () => {
     
     expect(total).toHaveTextContent(formatPrice(0));
 
-    const input = await screen.findByRole("spinbutton", { name: PRODUCTS.AMERICA });
+    const input = await screen.findByRole("spinbutton", { name: PRODUCTS[0].name });
     await user.clear(input);
     await user.type(input, "1");
-    expect(total).toHaveTextContent(formatPrice(PRICES.PRODUCT_UNIT));
+    expect(total).toHaveTextContent(formatPrice(PRODUCTS[0].price));
   });
 
   test("옵션 하나를 추가했을 때 총 금액이 올바르게 계산된다", async () => {
     const user = setupTest(<OrderPage />);
     const total = screen.getByText("총 금액", { exact: false });
 
-    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.INSURANCE });
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[0].name });
     await user.click(insuranceCheckbox);
-    expect(total).toHaveTextContent(formatPrice(PRICES.OPTION_UNIT));
+    expect(total).toHaveTextContent(formatPrice(OPTIONS[0].price));
   });
 
   test("옵션과 상품을 추가하고 제거할 때 총 금액이 올바르게 계산된다", async () => {
@@ -114,17 +144,17 @@ describe("상품과 옵션의 총 금액 계산", () => {
     const total = screen.getByText("총 금액", { exact: false });
 
     // 보험 옵션 추가
-    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS.INSURANCE });
+    const insuranceCheckbox = await screen.findByRole("checkbox", { name: OPTIONS[0].name });
     await user.click(insuranceCheckbox);
 
     // 상품 3개 추가 후 1개로 수정
-    const input = await screen.findByRole("spinbutton", { name: PRODUCTS.AMERICA });
+    const input = await screen.findByRole("spinbutton", { name: PRODUCTS[0].name });
     await user.clear(input);
     await user.type(input, "3");
     await user.clear(input);
     await user.type(input, "1");
 
-    const expectedTotal = PRICES.PRODUCT_UNIT + PRICES.OPTION_UNIT;
+    const expectedTotal = PRODUCTS[0].price + OPTIONS[0].price;
     expect(total).toHaveTextContent(formatPrice(expectedTotal));
   });
 });
