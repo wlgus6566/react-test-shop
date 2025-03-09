@@ -42,7 +42,7 @@ const TEST_OPTIONS_DATA = [
 
 // 헬퍼 함수
 const findAndTypeInput = async (user, name, value) => {
-    const input = await screen.findByRole("spinbutton", { name });
+    const input = await screen.findByLabelText(`${name} 수량`);
     await user.clear(input);
     await user.type(input, value);
     return input;
