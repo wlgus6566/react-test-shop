@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import { useWishlist } from "../contexts/WishlistContext";
+import { OrderContext } from '../contexts/OrderContext';
 
 function Header() {
   const { wishlist } = useWishlist();
   const location = useLocation();
+  const [{ userPoints }] = useContext(OrderContext);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+  }, []);
 
   return (
     <header className="bg-light py-3 shadow-sm">
@@ -44,6 +54,17 @@ function Header() {
               )}
             </Link>
           </div>
+
+          {user && (
+            <div className="d-flex align-items-center">
+              <span className="me-3">
+                <strong>{user.username}</strong>님
+              </span>
+              <span className="me-3">
+                포인트: <strong>{userPoints?.toLocaleString()}</strong>P
+              </span>
+            </div>
+          )}
         </nav>
       </div>
     </header>
