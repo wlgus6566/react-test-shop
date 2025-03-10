@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { act } from '@testing-library/react';
 import Type from "../Type";
 import { OrderContextProvider } from "../../../contexts/OrderContext";
 import { WishlistProvider } from "../../../contexts/WishlistContext";
@@ -43,14 +44,18 @@ const TEST_OPTIONS_DATA = [
 // 헬퍼 함수
 const findAndTypeInput = async (user, name, value) => {
     const input = await screen.findByLabelText(`${name} 수량`);
-    await user.clear(input);
-    await user.type(input, value);
+    await act(async () => {
+        await user.clear(input);
+        await user.type(input, value);
+    });
     return input;
 };
 
 const findAndToggleOption = async (user, name) => {
     const checkbox = await screen.findByRole("checkbox", { name });
-    await user.click(checkbox);
+    await act(async () => {
+        await user.click(checkbox);
+    });
     return checkbox;
 };
 
@@ -63,14 +68,18 @@ const getTotalText = (type) => {
 const formatPrice = (price) => `${price.toLocaleString()}원`;
 
 // 렌더링 헬퍼 함수 수정
-const renderWithProviders = (ui) => {
-    return render(
-        <WishlistProvider>
-            <OrderContextProvider>
-                {ui}
-            </OrderContextProvider>
-        </WishlistProvider>
-    );
+const renderWithProviders = async (ui) => {
+    let result;
+    await act(async () => {
+        result = render(
+            <WishlistProvider>
+                <OrderContextProvider>
+                    {ui}
+                </OrderContextProvider>
+            </WishlistProvider>
+        );
+    });
+    return result;
 };
 
 describe("상품 및 옵션 선택 테스트", () => {
@@ -83,15 +92,15 @@ describe("상품 및 옵션 선택 테스트", () => {
             );
         });
 
-        test("초기 상품 가격은 0원이다", () => {
-            renderWithProviders(<Type orderType="products" />);
+        test("초기 상품 가격은 0원이다", async () => {
+            await renderWithProviders(<Type orderType="products" />);
             const total = getTotalText("products");
             expect(total).toHaveTextContent("총 상품 가격: 0원");
         });
 
         test("상품 개수 변경 시 총 가격이 올바르게 계산된다", async () => {
             const user = userEvent.setup();
-            renderWithProviders(<Type orderType="products" />);
+            await renderWithProviders(<Type orderType="products" />);
             const testCases = [
                 { product: "America", quantity: "2", expected: 2000 },
                 { product: "America", quantity: "3", expected: 3000 },
@@ -118,15 +127,15 @@ describe("상품 및 옵션 선택 테스트", () => {
             );
         });
 
-        test("초기 옵션 가격은 0원이다", () => {
-            renderWithProviders(<Type orderType="options" />);
+        test("초기 옵션 가격은 0원이다", async () => {
+            await renderWithProviders(<Type orderType="options" />);
             const total = getTotalText("options");
             expect(total).toHaveTextContent("총 옵션 가격: 0원");
         });
 
         test("옵션 체크박스 토글 시 총 가격이 올바르게 계산된다", async () => {
             const user = userEvent.setup();
-            renderWithProviders(<Type orderType="options" />);
+            await renderWithProviders(<Type orderType="options" />);
             const total = getTotalText("options");
 
             // Insurance 선택
