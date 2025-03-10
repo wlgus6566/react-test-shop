@@ -103,23 +103,6 @@ describe('Cart Service', () => {
                 total: 4400
             });
         });
-
-        test('할인 쿠폰 적용 시 할인된 금액으로 계산된다', () => {
-            const cart = new CartService();
-            const coupon = { code: 'SAVE10', discountRate: 10 };
-            
-            cart.addToCart(mockProduct, 2);  // 2000원
-            cart.applyCoupon(coupon);
-
-            const result = cart.calculateTotal();
-
-            expect(result).toEqual({
-                subtotal: 2000,
-                discount: 200,   // 10% 할인
-                tax: 180,        // 할인 후 금액에 대한 10% 세금
-                total: 1980
-            });
-        });
     });
 });
 ```
@@ -168,18 +151,18 @@ describe('SummaryPage', () => {
 ```javascript
 // 인증 테스트 데이터
 const TEST_USERS = [
-    {
-        email: 'test@example.com',
-        password: 'Password!123',
-        name: 'Test User',
-        role: 'user'
-    },
-    {
-        email: 'admin@example.com',
-        password: 'Admin!123',
-        name: 'Admin User',
-        role: 'admin'
-    }
+  {
+    "id": 5,
+    "username": "wlgus65666",
+    "password": "1234",
+    "points": 5000
+  },
+  {
+    "id": 6,
+    "username": "wlgus6566",
+    "password": "1234",
+    "points": 5000
+  }
 ];
 
 // API 응답 데이터
