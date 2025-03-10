@@ -3,16 +3,26 @@ import { http, delay, HttpResponse } from "msw";
 // MSW에서 http://localhost:5003/products 요청을 가로채기
 export const handlers = [
   // 로그인 API 모킹
-  http.post("http://localhost:5003/login", async () => {
+  http.post("http://localhost:5003/login", async ({ request }) => {
+    const { username, password } = await request.json();
     await delay(100);
-    return HttpResponse.json({
-      token: "mock-jwt-token",
-      user: {
-        id: 1,
-        username: "Mozelle34",
-        points: 5000
-      }
-    });
+
+    // 사용자 인증 검증
+    if (username === "wlgus6566" && password === "1234") {
+      return HttpResponse.json({
+        token: "mock-jwt-token",
+        user: {
+          id: 1,
+          username: "wlgus6566",
+          points: 5000
+        }
+      });
+    } else {
+      return new HttpResponse(null, {
+        status: 401,
+        statusText: "Unauthorized"
+      });
+    }
   }),
 
   // GET /products 요청 핸들링
@@ -21,11 +31,18 @@ export const handlers = [
       {
         name: "America",
         imagePath: "/images/america.jpeg",
+        price: 1000
       },
       {
         name: "England",
         imagePath: "/images/england.jpeg",
+        price: 2000
       },
+      {
+        name: "Portland",
+        imagePath: "/images/portland.jpeg",
+        price: 1500
+      }
     ]);
   }),
 
@@ -39,10 +56,16 @@ export const handlers = [
     return HttpResponse.json([
       {
         name: "Insurance",
+        price: 500
       },
       {
         name: "Dinner",
+        price: 1000
       },
+      {
+        name: "FirstClass",
+        price: 2000
+      }
     ]);
   }),
 

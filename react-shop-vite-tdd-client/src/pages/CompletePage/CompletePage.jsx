@@ -23,20 +23,19 @@ function CompletePage({ setStep }) {
         }
     };
 
-    // ✅ 주문 내역 초기화 함수 추가
     const clearOrderHistory = async () => {
         try {
             await orderApi.clearOrderHistory();
-            setOrderHistory([]); // ✅ 프론트에서도 주문 내역 초기화
-            console.log("✅ 주문 내역 초기화 완료");
+            setOrderHistory([]); 
+            console.log(" 주문 내역 초기화 완료");
         } catch (error) {
-            console.error("🚨 주문 내역 초기화 실패", error);
+            console.error(" 주문 내역 초기화 실패", error);
         }
     };
 
     const handleClick = () => {
         resetOrderDatas();
-        setOrderHistory([]); // ✅ 주문 내역 초기화
+        setOrderHistory([]); // 주문 내역 초기화
         setStep(0);
     };
 
@@ -74,7 +73,7 @@ function CompletePage({ setStep }) {
                         </div>
 
                         <div className="mb-4">
-                            <h3 className="text-center mb-3">주문 내역</h3>
+                            <h3 className="text-center mb-3">지금까지의 주문 내역</h3>
                             <div className="table-responsive">
                                 <table className="table table-hover">
                                     <thead className="table-light">
