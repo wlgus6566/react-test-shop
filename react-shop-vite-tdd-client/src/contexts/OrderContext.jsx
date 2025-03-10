@@ -59,9 +59,8 @@ export function OrderContextProvider(props) {
   }, []);
 
   // 사용자 포인트는 로그인 시 서버에서 받아온 값으로 설정됨
-  const [userPoints, setUserPoints] = useState(0);
+  const [userPoints, setUserPoints] = useState(5000);
 
-  // ✅ 주문 수량이 변경될 때 총 금액을 다시 계산하는 useEffect
   useEffect(() => {
     if (orderCounts.products.size === 0 && orderCounts.options.size === 0) {
       setTotals({ products: 0, options: 0, total: 0 }); // 🛠 주문 초기화 시 즉시 0으로 설정
@@ -74,7 +73,7 @@ export function OrderContextProvider(props) {
         total: productsTotal + optionsTotal,
       });
     }
-  }, [orderCounts, prices]); // ⬅ orderCounts 변경될 때마다 실행
+  }, [orderCounts, prices]); 
 
   // Context에서 공유할 값
   const value = useMemo(() => {
@@ -99,19 +98,13 @@ export function OrderContextProvider(props) {
     function resetOrderDatas() {
       console.log("🛠 주문 데이터 초기화 시작");
 
-      // ✅ 주문 수량을 먼저 초기화
       setOrderCounts({
         products: new Map(),
         options: new Map(),
       });
 
-      // ✅ 총 가격도 즉시 0으로 설정
       setTotals({ products: 0, options: 0, total: 0 });
 
-      // ✅ 포인트 초기화
-      setUserPoints(0);
-
-      // ✅ 상태 업데이트 후 강제 리렌더링 트리거
       setTimeout(() => {
         console.log("🔄 주문 데이터 완전 초기화 완료");
       }, 50);

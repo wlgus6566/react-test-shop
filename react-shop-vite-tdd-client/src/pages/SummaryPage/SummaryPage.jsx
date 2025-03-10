@@ -28,7 +28,9 @@ const SummaryPage = ({ setStep }) => {
 
     // ✅ 포인트 입력 시 실시간 유효성 검사
     const handlePointsChange = (event) => {
-        const pointsInput = parseInt(event.target.value, 10) || 0;
+        // 숫자가 아닌 문자 제거
+        const value = event.target.value.replace(/[^0-9]/g, '');
+        const pointsInput = parseInt(value, 10) || 0;
         const { isValid, message } = validatePointsInput({
             userPoints,
             totalPrice,
@@ -112,13 +114,13 @@ const SummaryPage = ({ setStep }) => {
                 <div className="mt-2">
                     <label htmlFor="usedPointsInput" className="form-label fw-bold">사용할 포인트:</label>
                     <input
-                        type="number"
+                        type="text"
                         id="usedPointsInput"
                         className="point-input"
                         value={usedPoints}
                         onChange={handlePointsChange}
-                        min="0"
-                        max={userPoints}
+                        placeholder="사용할 포인트를 입력하세요"
+                        maxLength={10}
                     />
                     <p className="text-muted">사용 가능 포인트: {userPoints.toLocaleString()}원</p>
                     {error && <p className="error-message">{error}</p>}
@@ -149,4 +151,4 @@ const SummaryPage = ({ setStep }) => {
     );
 };
 
-export default SummaryPage; 
+export default SummaryPage;

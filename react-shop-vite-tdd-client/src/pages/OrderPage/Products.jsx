@@ -49,7 +49,7 @@ function Products({ name, imagePath, price = 0, updateItemCount }) {
           background: "#f8f9fa",
           position: "relative",
           width: "100%",
-          paddingTop: "100%", // 1:1 비율 유지
+          paddingTop: "58%",
           overflow: "hidden"
         }}>
           <img
@@ -66,7 +66,7 @@ function Products({ name, imagePath, price = 0, updateItemCount }) {
           />
         </div>
       </div>
-      <div className="card-body d-flex flex-column align-items-center" style={{ padding: "1.5rem" }}>
+      <div className="card-body d-flex flex-column align-items-center" style={{ padding: "1rem 0.5rem 0.5rem" }}>
         <h5 className="card-title mb-2 fw-bold">{name}</h5>
         <p className="text-primary fw-bold" style={{ fontSize: "1.1rem", marginBottom: "0" }}>
           {price.toLocaleString()}원
