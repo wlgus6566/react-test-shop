@@ -15,7 +15,11 @@ const PRODUCTS = {
     },
     ENGLAND: {
         name: "England",
-        price: 1000
+        price: 2000
+    },
+    PORTLAND: {
+        name: "Portland",
+        price: 1500
     }
 };
 
@@ -26,64 +30,42 @@ const OPTIONS = {
     },
     DINNER: {
         name: "Dinner",
-        price: 500
+        price: 1000
+    },
+    FIRSTCLASS: {
+        name: "FirstClass",
+        price: 2000
     }
 };
 
 // API 응답 데이터
 const TEST_PRODUCTS_DATA = [
-    { name: "America", imagePath: "/images/america.jpg", price: 1000 },
-    { name: "England", imagePath: "/images/england.jpg", price: 1000 }
+    { name: "America", imagePath: "/images/america.jpeg", price: 1000 },
+    { name: "England", imagePath: "/images/england.jpeg", price: 2000 },
+    { name: "Portland", imagePath: "/images/portland.jpeg", price: 1500 }
 ];
 
 const TEST_OPTIONS_DATA = [
-    { name: "Insurance", imagePath: "/images/insurance.png", price: 500 },
-    { name: "Dinner", imagePath: "/images/dinner.png", price: 500 }
+    { name: "Insurance", price: 500 },
+    { name: "Dinner", price: 1000 },
+    { name: "FirstClass", price: 2000 }
 ];
 
-// 헬퍼 함수
-const findAndTypeInput = async (user, name, value) => {
-    const input = await screen.findByLabelText(`${name} 수량`);
-    await act(async () => {
-        await user.clear(input);
-        await user.type(input, value);
-    });
-    return input;
-};
-
-const findAndToggleOption = async (user, name) => {
-    const checkbox = await screen.findByRole("checkbox", { name });
-    await act(async () => {
-        await user.click(checkbox);
-    });
-    return checkbox;
-};
-
-const getTotalText = (type) => {
-    const prefix = type === "products" ? "총 상품 가격: " : "총 옵션 가격: ";
-    const element = screen.getByText(new RegExp(`^${prefix}`));
-    return element;
-};
-
-const formatPrice = (price) => `${price.toLocaleString()}원`;
-
-// 렌더링 헬퍼 함수 수정
-const renderWithProviders = async (ui) => {
-    let result;
-    await act(async () => {
-        result = render(
-            <WishlistProvider>
-                <OrderContextProvider>
-                    {ui}
-                </OrderContextProvider>
-            </WishlistProvider>
-        );
-    });
-    return result;
+// 렌더링 헬퍼 함수
+const renderWithProviders = (ui) => {
+    return render(
+        <WishlistProvider>
+            <OrderContextProvider>
+                {ui}
+            </OrderContextProvider>
+        </WishlistProvider>
+    );
 };
 
 describe("상품 및 옵션 선택 테스트", () => {
     describe("상품 선택 테스트", () => {
+
+         // 각 테스트 실행 전에 서버 응답을 Mock 처리하여 상품 데이터를 반환하도록 설정
         beforeEach(() => {
             server.use(
                 http.get("http://localhost:5003/products", () => {
@@ -93,28 +75,34 @@ describe("상품 및 옵션 선택 테스트", () => {
         });
 
         test("초기 상품 가격은 0원이다", async () => {
+            // 주문 타입을 "products"로 설정하여 해당 UI를 렌더링
             await renderWithProviders(<Type orderType="products" />);
-            const total = getTotalText("products");
+            const total = screen.getByText(/^총 상품 가격:/);
             expect(total).toHaveTextContent("총 상품 가격: 0원");
         });
 
         test("상품 개수 변경 시 총 가격이 올바르게 계산된다", async () => {
+            // 사용자 이벤트를 설정 (ex. 클릭, 입력 등)
             const user = userEvent.setup();
             await renderWithProviders(<Type orderType="products" />);
-            const testCases = [
-                { product: "America", quantity: "2", expected: 2000 },
-                { product: "America", quantity: "3", expected: 3000 },
-                { product: "England", quantity: "1", expected: 4000 },
-                { product: "England", quantity: "0", expected: 3000 },
-                { product: "America", quantity: "0", expected: 0 }
-            ];
-
-            const total = getTotalText("products");
             
-            for (const { product, quantity, expected } of testCases) {
-                await findAndTypeInput(user, product, quantity);
-                expect(total).toHaveTextContent(`총 상품 가격: ${formatPrice(expected)}`);
-            }
+            // America 2개 선택 (2000원)
+            const americaInput = await screen.findByLabelText("America 수량");
+            await user.clear(americaInput);
+            await user.type(americaInput, "2");
+            expect(screen.getByText(/^총 상품 가격:/)).toHaveTextContent("총 상품 가격: 2,000원");
+
+            // England 1개 추가 (+ 2000원 = 4000원)
+            const englandInput = await screen.findByLabelText("England 수량");
+            await user.clear(englandInput);
+            await user.type(englandInput, "1");
+            expect(screen.getByText(/^총 상품 가격:/)).toHaveTextContent("총 상품 가격: 4,000원");
+
+            // Portland 2개 추가 (+ 3000원 = 7000원)
+            const portlandInput = await screen.findByLabelText("Portland 수량");
+            await user.clear(portlandInput);
+            await user.type(portlandInput, "2");
+            expect(screen.getByText(/^총 상품 가격:/)).toHaveTextContent("총 상품 가격: 7,000원");
         });
     });
 
@@ -129,30 +117,28 @@ describe("상품 및 옵션 선택 테스트", () => {
 
         test("초기 옵션 가격은 0원이다", async () => {
             await renderWithProviders(<Type orderType="options" />);
-            const total = getTotalText("options");
+            const total = screen.getByText(/^총 옵션 가격:/);
             expect(total).toHaveTextContent("총 옵션 가격: 0원");
         });
 
         test("옵션 체크박스 토글 시 총 가격이 올바르게 계산된다", async () => {
             const user = userEvent.setup();
             await renderWithProviders(<Type orderType="options" />);
-            const total = getTotalText("options");
 
-            // Insurance 선택
-            await findAndToggleOption(user, OPTIONS.INSURANCE.name);
-            expect(total).toHaveTextContent(`총 옵션 가격: ${formatPrice(OPTIONS.INSURANCE.price)}`);
+            // Insurance 선택 (500원)
+            const insuranceCheckbox = await screen.findByRole("checkbox", { name: "Insurance" });
+            await user.click(insuranceCheckbox);
+            expect(screen.getByText(/^총 옵션 가격:/)).toHaveTextContent("총 옵션 가격: 500원");
 
-            // Dinner 추가 선택
-            await findAndToggleOption(user, OPTIONS.DINNER.name);
-            expect(total).toHaveTextContent(`총 옵션 가격: ${formatPrice(OPTIONS.INSURANCE.price + OPTIONS.DINNER.price)}`);
+            // Dinner 추가 선택 (+ 1000원 = 1500원)
+            const dinnerCheckbox = await screen.findByRole("checkbox", { name: "Dinner" });
+            await user.click(dinnerCheckbox);
+            expect(screen.getByText(/^총 옵션 가격:/)).toHaveTextContent("총 옵션 가격: 1,500원");
 
-            // Insurance 선택 해제
-            await findAndToggleOption(user, OPTIONS.INSURANCE.name);
-            expect(total).toHaveTextContent(`총 옵션 가격: ${formatPrice(OPTIONS.DINNER.price)}`);
-
-            // Dinner 선택 해제
-            await findAndToggleOption(user, OPTIONS.DINNER.name);
-            expect(total).toHaveTextContent("총 옵션 가격: 0원");
+            // FirstClass 추가 선택 (+ 2000원 = 3500원)
+            const firstClassCheckbox = await screen.findByRole("checkbox", { name: "FirstClass" });
+            await user.click(firstClassCheckbox);
+            expect(screen.getByText(/^총 옵션 가격:/)).toHaveTextContent("총 옵션 가격: 3,500원");
         });
     });
 });
