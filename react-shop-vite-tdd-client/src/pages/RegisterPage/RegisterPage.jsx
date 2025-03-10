@@ -28,7 +28,7 @@ export default function RegisterPage() {
         <div className="register-container">
             <div className="register-box">
                 <h2>회원가입</h2>
-                {error && <div className="alert alert-danger">{error}</div>}
+                {error && <div className="alert alert-danger" role="alert">{error}</div>}
                 <form onSubmit={handleRegister}>
                     <div className="form-group">
                         <label htmlFor="username">아이디</label>

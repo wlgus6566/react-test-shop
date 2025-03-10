@@ -34,5 +34,23 @@
     "username": "wlgus6566",
     "password": "1234",
     "points": 5000
+  },
+  {
+    "id": 7,
+    "username": "testuser_1741600509857",
+    "password": "$2a$10$kwAoLKtjJaqbip2vfQoW4.0CrwP.zeqpMbfzDAbCVq7mQMX4ve2NS",
+    "points": 5000
+  },
+  {
+    "id": 8,
+    "username": "testuser_1741600819227",
+    "password": "$2a$10$oU/hj9C10bWQGisCT9uggeLfVcIktEHEy57FUU65Wej0hADzzMoLG",
+    "points": 5000
+  },
+  {
+    "id": 9,
+    "username": "testuser_1741600821434",
+    "password": "$2a$10$1VcDFb1iIMj7EZMyDgF/8OldIWlnqVNo0WvvaSdqbqPvbjvl3Qz9K",
+    "points": 5000
   }
 ]
