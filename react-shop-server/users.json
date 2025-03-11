@@ -64,5 +64,17 @@
     "username": "aaa1234",
     "password": "$2a$10$Gr.MvUtrOrFp.EydrO.L2eiVy6hQwPshNXKOWZV2uUZAXYXcwdJUq",
     "points": 5000
+  },
+  {
+    "id": 12,
+    "username": "wlgus",
+    "password": "$2a$10$7n6Bdt2MCiFLicr1tVCdQufD0eHptSKMUrxGPU5EzjB9KNXwTKY4q",
+    "points": 5000
+  },
+  {
+    "id": 13,
+    "username": "wlgusddd",
+    "password": "$2a$10$Dm3efQcx588xjKykO8VQOebtP7zYbNT4JknlbjrNZQvdWRx2FEssW",
+    "points": 5000
   }
 ]
