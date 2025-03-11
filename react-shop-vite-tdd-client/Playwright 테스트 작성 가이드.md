@@ -287,4 +287,20 @@ test.beforeEach(async ({ page, context }) => {
        await expect(page.getByText(TEST_USERS.valid.username)).toBeVisible();
        await expect(page.getByText(TEST_USERS.valid.points.toLocaleString())).toBeVisible();
    });
+
+   await test.step('주문 완료 확인', async () => {
+      // 주문 성공 메시지 확인
+      await expect(page.getByText('주문이 성공했습니다!')).toBeVisible();
+
+      // 남은 포인트 확인 (5000 - 2000 = 3000)
+      await expect(page.getByText('남은 포인트: 3,000원')).toBeVisible();
+
+      // 주문 내역의 최종 결제 금액 확인
+      const orderTable = page.getByRole('table');
+      await expect(orderTable).toBeVisible();
+      
+      // 가장 최근 주문의 금액이 5,000원인지 확인
+      const lastOrderPrice = await page.locator('table tbody tr:last-child td:last-child').textContent();
+      expect(lastOrderPrice).toBe('5000');
+        });
    ```
