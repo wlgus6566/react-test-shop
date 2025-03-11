@@ -26,7 +26,7 @@ const SummaryPage = ({ setStep }) => {
         .map(([name]) => name)
         .join(", ");
 
-    // ✅ 포인트 입력 시 실시간 유효성 검사
+    // 포인트 입력 시 실시간 유효성 검사
     const handlePointsChange = (event) => {
         // 숫자가 아닌 문자 제거
         const value = event.target.value.replace(/[^0-9]/g, '');
@@ -47,7 +47,7 @@ const SummaryPage = ({ setStep }) => {
         setIsSubmitting(true);
 
         try {
-            // ✅ 결제 처리
+            // 결제 처리
             const paymentResult = await processPayment({
                 userPoints,
                 totalPrice,
@@ -63,7 +63,7 @@ const SummaryPage = ({ setStep }) => {
                 };
 
                 const response = await orderApi.createOrder(orderData);
-                console.log("✅ 주문 완료:", response);
+                console.log(" 주문 완료:", response);
                 setStep(2);
             }
         } catch (e) {
