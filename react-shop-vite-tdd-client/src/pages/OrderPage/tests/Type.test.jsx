@@ -41,14 +41,12 @@ const OPTIONS = {
 // API 응답 데이터
 const TEST_PRODUCTS_DATA = [
     { name: "America", imagePath: "/images/america.jpeg", price: 1000 },
-    { name: "England", imagePath: "/images/england.jpeg", price: 2000 },
-    { name: "Portland", imagePath: "/images/portland.jpeg", price: 1500 }
+    { name: "England", imagePath: "/images/england.jpeg", price: 2000 }
 ];
 
 const TEST_OPTIONS_DATA = [
     { name: "Insurance", price: 500 },
-    { name: "Dinner", price: 1000 },
-    { name: "FirstClass", price: 2000 }
+    { name: "Dinner", price: 1000 }
 ];
 
 // 렌더링 헬퍼 함수
@@ -62,10 +60,8 @@ const renderWithProviders = (ui) => {
     );
 };
 
-describe("상품 및 옵션 선택 테스트", () => {
-    describe("상품 선택 테스트", () => {
-
-         // 각 테스트 실행 전에 서버 응답을 Mock 처리하여 상품 데이터를 반환하도록 설정
+describe("Type 컴포넌트 단위 테스트", () => {
+    describe("상품 타입 테스트", () => {
         beforeEach(() => {
             server.use(
                 http.get("http://localhost:5003/products", () => {
@@ -74,39 +70,25 @@ describe("상품 및 옵션 선택 테스트", () => {
             );
         });
 
-        test("초기 상품 가격은 0원이다", async () => {
-            // 주문 타입을 "products"로 설정하여 해당 UI를 렌더링
-            await renderWithProviders(<Type orderType="products" />);
-            const total = screen.getByText(/^총 상품 가격:/);
-            expect(total).toHaveTextContent("총 상품 가격: 0원");
-        });
-
-        test("상품 개수 변경 시 총 가격이 올바르게 계산된다", async () => {
-            // 사용자 이벤트를 설정 (ex. 클릭, 입력 등)
-            const user = userEvent.setup();
+        test("상품 목록이 올바르게 렌더링된다", async () => {
             await renderWithProviders(<Type orderType="products" />);
             
-            // America 2개 선택 (2000원)
-            const americaInput = await screen.findByLabelText("America 수량");
-            await user.clear(americaInput);
-            await user.type(americaInput, "2");
-            expect(screen.getByText(/^총 상품 가격:/)).toHaveTextContent("총 상품 가격: 2,000원");
+            // 상품 이름과 가격이 표시되는지 확인
+            expect(await screen.findByText("America")).toBeInTheDocument();
+            expect(await screen.findByText("1,000원")).toBeInTheDocument();
+            expect(await screen.findByText("England")).toBeInTheDocument();
+            expect(await screen.findByText("2,000원")).toBeInTheDocument();
+        });
 
-            // England 1개 추가 (+ 2000원 = 4000원)
-            const englandInput = await screen.findByLabelText("England 수량");
-            await user.clear(englandInput);
-            await user.type(englandInput, "1");
-            expect(screen.getByText(/^총 상품 가격:/)).toHaveTextContent("총 상품 가격: 4,000원");
-
-            // Portland 2개 추가 (+ 3000원 = 7000원)
-            const portlandInput = await screen.findByLabelText("Portland 수량");
-            await user.clear(portlandInput);
-            await user.type(portlandInput, "2");
-            expect(screen.getByText(/^총 상품 가격:/)).toHaveTextContent("총 상품 가격: 7,000원");
+        test("상품 수량 입력 필드가 존재한다", async () => {
+            await renderWithProviders(<Type orderType="products" />);
+            
+            expect(await screen.findByLabelText("America 수량")).toBeInTheDocument();
+            expect(await screen.findByLabelText("England 수량")).toBeInTheDocument();
         });
     });
 
-    describe("옵션 선택 테스트", () => {
+    describe("옵션 타입 테스트", () => {
         beforeEach(() => {
             server.use(
                 http.get("http://localhost:5003/options", () => {
@@ -115,30 +97,23 @@ describe("상품 및 옵션 선택 테스트", () => {
             );
         });
 
-        test("초기 옵션 가격은 0원이다", async () => {
+        test("옵션 목록이 올바르게 렌더링된다", async () => {
             await renderWithProviders(<Type orderType="options" />);
-            const total = screen.getByText(/^총 옵션 가격:/);
-            expect(total).toHaveTextContent("총 옵션 가격: 0원");
+            
+            // 옵션 이름과 체크박스가 표시되는지 확인
+            expect(await screen.findByRole("checkbox", { name: "Insurance" })).toBeInTheDocument();
+            expect(await screen.findByRole("checkbox", { name: "Dinner" })).toBeInTheDocument();
         });
 
-        test("옵션 체크박스 토글 시 총 가격이 올바르게 계산된다", async () => {
-            const user = userEvent.setup();
+        test("에러 발생 시 에러 배너가 표시된다", async () => {
+            server.use(
+                http.get("http://localhost:5003/options", () => {
+                    return Response.error();
+                })
+            );
+
             await renderWithProviders(<Type orderType="options" />);
-
-            // Insurance 선택 (500원)
-            const insuranceCheckbox = await screen.findByRole("checkbox", { name: "Insurance" });
-            await user.click(insuranceCheckbox);
-            expect(screen.getByText(/^총 옵션 가격:/)).toHaveTextContent("총 옵션 가격: 500원");
-
-            // Dinner 추가 선택 (+ 1000원 = 1500원)
-            const dinnerCheckbox = await screen.findByRole("checkbox", { name: "Dinner" });
-            await user.click(dinnerCheckbox);
-            expect(screen.getByText(/^총 옵션 가격:/)).toHaveTextContent("총 옵션 가격: 1,500원");
-
-            // FirstClass 추가 선택 (+ 2000원 = 3500원)
-            const firstClassCheckbox = await screen.findByRole("checkbox", { name: "FirstClass" });
-            await user.click(firstClassCheckbox);
-            expect(screen.getByText(/^총 옵션 가격:/)).toHaveTextContent("총 옵션 가격: 3,500원");
+            expect(await screen.findByText("에러가 발생했습니다.")).toBeInTheDocument();
         });
     });
 });

@@ -52,5 +52,17 @@
     "username": "testuser_1741600821434",
     "password": "$2a$10$1VcDFb1iIMj7EZMyDgF/8OldIWlnqVNo0WvvaSdqbqPvbjvl3Qz9K",
     "points": 5000
+  },
+  {
+    "id": 10,
+    "username": "wlgus594",
+    "password": "$2a$10$MyBJBxqgSbj8iR1R8T2klOGIcd6fpLsgGC2Om2rIMDW3mUDhV9vOq",
+    "points": 5000
+  },
+  {
+    "id": 11,
+    "username": "aaa1234",
+    "password": "$2a$10$Gr.MvUtrOrFp.EydrO.L2eiVy6hQwPshNXKOWZV2uUZAXYXcwdJUq",
+    "points": 5000
   }
 ]

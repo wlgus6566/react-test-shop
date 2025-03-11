@@ -188,6 +188,7 @@ await expect(page.getByRole('listitem')).toHaveCount(3);
    ```
 
 ## 6. 테스트 데이터 관리
+- 테스트데이터는 fixtures 폴더 아래에 위치
 ```ts
 // tests/fixtures/users.ts
 export const TEST_USERS = {
